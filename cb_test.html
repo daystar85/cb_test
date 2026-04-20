@@ -2012,6 +2012,18 @@
       display: block;
     }
 
+    /* ═══ MANUAL PAGE TRANSITION ═══ */
+    #page-manual {
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.3, 1);
+    }
+
+    #page-manual.page-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     /* ═══ RESPONSIVE ═══ */
     @media (max-width: 360px) {
       .rval {
@@ -14046,7 +14058,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       document.body.classList.remove('manual-mode');
       document.body.classList.add('calc-mode');
       const pm1 = document.getElementById('page-manual');
-      if (pm1) pm1.style.display = 'none';
+      if (pm1) { pm1.classList.remove('page-visible'); pm1.style.display = 'none'; }
       const pset1 = document.getElementById('page-settings');
       if (pset1) pset1.style.display = 'none';
       ['page-settings-data', 'page-settings-adv', 'page-settings-plan'].forEach(id => {
@@ -14095,7 +14107,11 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       if (pt0) pt0.style.display = 'none';
       document.getElementById('card-input').style.display = 'none';
       const pm2 = document.getElementById('page-manual');
-      if (pm2) pm2.style.display = 'block';
+      if (pm2) {
+        pm2.classList.remove('page-visible');
+        pm2.style.display = 'block';
+        requestAnimationFrame(() => requestAnimationFrame(() => pm2.classList.add('page-visible')));
+      }
       document.getElementById('main-tabs').style.display = 'none';
       document.getElementById('rec-test-tabs').style.display = 'none';
       document.getElementById('header-search-wrap').style.display = 'block';
@@ -14118,7 +14134,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       localStorage.setItem('cb_active_mode', 'record');
       document.body.classList.remove('manual-mode');
       const pm = document.getElementById('page-manual');
-      if (pm) pm.style.display = 'none';
+      if (pm) { pm.classList.remove('page-visible'); pm.style.display = 'none'; }
       const pset3 = document.getElementById('page-settings');
       if (pset3) pset3.style.display = 'none';
       ['page-settings-data', 'page-settings-adv', 'page-settings-plan'].forEach(id => {
@@ -14161,7 +14177,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       document.body.classList.remove('calc-mode');
       localStorage.setItem('cb_active_mode', 'tools');
       const pm = document.getElementById('page-manual');
-      if (pm) pm.style.display = 'none';
+      if (pm) { pm.classList.remove('page-visible'); pm.style.display = 'none'; }
       const ps = document.getElementById('page-settings');
       if (ps) ps.style.display = 'none';
       ['page-settings-data', 'page-settings-adv', 'page-settings-plan'].forEach(id => {
@@ -14232,7 +14248,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       document.body.classList.remove('manual-mode');
       document.body.classList.remove('calc-mode');
       const pm = document.getElementById('page-manual');
-      if (pm) pm.style.display = 'none';
+      if (pm) { pm.classList.remove('page-visible'); pm.style.display = 'none'; }
       const pt2 = document.getElementById('page-tools');
       if (pt2) pt2.style.display = 'none';
       ['page-btf', 'page-t1s', 'page-t1a', 'page-slf', 'page-op2', 'page-spf', 'page-lccb', 'page-sr', 'page-stc', 'page-record'].forEach(id => {
