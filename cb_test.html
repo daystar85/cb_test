@@ -15097,11 +15097,19 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         else if ((cLow.includes('trv') || cLow.includes('uc') || cLow.includes('um')) && opts.trv) {
           const tId = TRV_MAP[tab];
           if (tId) {
-            const tVal = parseFloat(document.getElementById(tId)?.textContent || '0');
+            let tVal = parseFloat(document.getElementById(tId)?.textContent || '');
+            const _Ur = parseFloat(document.getElementById('inp-ur')?.value) || 0;
+            if (!(tVal > 0) && (tab === 'l90' || tab === 'l75') && _Ur) {
+              const _Isc = parseFloat(document.getElementById('inp-isc')?.value) || 0;
+              const _fr  = parseFloat(document.getElementById('inp-fr')?.value)  || 60;
+              if (_Isc) {
+                const _Z = 450, _kaf = 1.4, _tdL = _Ur >= 245 ? 0.5 : 0.2, _pct = tab === 'l90' ? 90 : 75;
+                tVal = slfCalc(_Ur, _Isc, _fr, _Z, _tdL, _kaf, _pct).um;
+              }
+            }
             if (tVal > 0) {
-              // L90/L75 Um: 0 ~ +10% (Ur≤72.5) or 0 ~ +5% (Ur>72.5)
               const loFactor = (tab === 'l90' || tab === 'l75') ? 1.0 : 0.95;
-              const hiFactor = (tab === 'l90' || tab === 'l75') ? (Ur > 72.5 ? 1.05 : 1.10) : 1.20;
+              const hiFactor = (tab === 'l90' || tab === 'l75') ? (_Ur > 72.5 ? 1.05 : 1.10) : 1.20;
               if (val < tVal * loFactor)      warnDir = 'low';
               else if (val > tVal * hiFactor) warnDir = 'high';
             }
@@ -17314,7 +17322,14 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         else if (tab==='t30')  ucNom = Ur*kpp*1.54*S23;
         else if (tab==='t60')  ucNom = Ur*kpp*1.5*S23;
         else if (tab==='t100s'||tab==='t100a') ucNom = Ur*kpp*1.4*S23;
-        else if (tab==='l90'||tab==='l75') { const el = document.getElementById('slf-um'); if (el) ucNom = parseFloat(el.textContent) || null; }
+        else if (tab==='l90'||tab==='l75') {
+          const el = document.getElementById('slf-um');
+          ucNom = el ? (parseFloat(el.textContent) || null) : null;
+          if (!ucNom && Ur && Isc) {
+            const _Z = 450, _kaf = 1.4, _tdL = Ur >= 245 ? 0.5 : 0.2, _pct = tab === 'l90' ? 90 : 75;
+            ucNom = slfCalc(Ur, Isc, fr, _Z, _tdL, _kaf, _pct).um;
+          }
+        }
         const ucMin = ucNom ? ucNom : null;  // Uc: 0% ~ +5% (Ur>72.5) or +10%
         const ucMax = ucNom ? ucNom*(Ur>72.5?1.05:1.10) : null;
 
