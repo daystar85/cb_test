@@ -2622,6 +2622,39 @@
       font-size: 0.786rem;
     }
 
+    .man-note + .man-note {
+      margin-top: 10px;
+      margin-bottom: 0;
+    }
+
+    .man-note:last-child {
+      margin-bottom: 0;
+    }
+
+    .man-note > .man-list {
+      margin-top: 8px;
+    }
+
+    .man-formula {
+      background: var(--sf2);
+      border: 1px solid var(--bd);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-top: 8px;
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      line-height: 2;
+      color: var(--tx);
+    }
+
+    .man-img-cap {
+      font-size: 0.714rem;
+      color: var(--mu);
+      font-family: var(--mono);
+      text-align: center;
+      margin-top: 6px;
+    }
+
     /* Scrollable table wrapper */
     .tbl-scroll {
       overflow-x: auto;
@@ -10630,7 +10663,7 @@
               <img
                 src="data:image/webp;base64,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"
                 alt="th 파형 정의도" style="width:100%;max-width:420px;display:block;margin:0 auto;border-radius:4px;" />
-              <div class="edu-svg-cap">i : 차단전류 &nbsp;|&nbsp; i<sub>h</sub> : 주입전류(중첩구간) &nbsp;|&nbsp; i<sub>p</sub> :
+              <div class="man-img-cap">i : 차단전류 &nbsp;|&nbsp; i<sub>h</sub> : 주입전류(중첩구간) &nbsp;|&nbsp; i<sub>p</sub> :
                 주입전류(단독구간) &nbsp;|&nbsp; t<sub>h</sub> : 주입시간 &nbsp;|&nbsp; T<sub>h</sub> : 반주기</div>
             </div>
             <ul class="man-list">
@@ -10912,66 +10945,73 @@
               X/R 값이 클수록 DC 오프셋이 크고 오래 지속되어, 차단기가 경험하는 비대칭 전류가 더 가혹해집니다.
             </div>
 
-            <div class="man-note" style="margin-top:10px;">
+            <div class="man-note">
               <b>정의 및 계산식</b><br>
-              <div style="background:var(--sf2); border:1px solid var(--bd); border-radius:8px; padding:14px 18px; margin-top:8px; font-family:var(--mono); font-size:0.929rem;">
+              <div class="man-formula">
                 X/R = ω × τ = 2π × f × τ
               </div>
-              <ul class="man-list" style="margin-top:10px;">
+              <ul class="man-list">
                 <li><b>ω</b> : 각주파수 (rad/s) = 2πf</li>
                 <li><b>f</b> : 계통 주파수 (Hz)</li>
                 <li><b>τ</b> : DC 시정수 (s) — 직류 성분이 1/e ≈ 36.8% 로 감소하는 데 걸리는 시간</li>
               </ul>
             </div>
 
-            <div class="man-note" style="margin-top:10px; border-left-color: var(--acc);">
+            <div class="man-note">
               <b>계산 예시</b><br>
-              <div style="background:var(--sf2); border:1px solid var(--bd); border-radius:8px; padding:14px 18px; margin-top:8px; font-family:var(--mono); font-size:0.929rem; line-height:2;">
+              <div class="man-formula">
                 f = 60 Hz, τ = 45 ms = 0.045 s<br>
                 X/R = 2π × 60 × 0.045 ≈ <b style="color:var(--acc); font-size:1.05rem;">17</b>
               </div>
             </div>
 
-            <div class="man-note" style="margin-top:10px;">
+            <div class="man-note">
               <b>물리적 의미</b>
-              <ul class="man-list" style="margin-top:8px;">
+              <ul class="man-list">
                 <li>단락 사고 시 전류는 교류 성분(AC)과 직류 성분(DC)의 합성으로 나타납니다. DC 성분의 초기값과 감쇠 속도는 X/R에 의해 결정됩니다.</li>
                 <li>X/R이 클수록 DC 성분이 느리게 감쇠 → 전류 영점(current zero)이 늦게 발생 → 아크 지속 시간 증가 → 차단기에 가혹한 조건</li>
                 <li>X/R이 작을수록 DC 성분이 빠르게 감쇠 → 비교적 빠른 전류 영점 → 상대적으로 유리한 차단 조건</li>
               </ul>
             </div>
 
-            <div class="man-note" style="margin-top:10px;">
+            <div class="man-note">
               <b>IEC 시험과의 관계</b>
-              <ul class="man-list" style="margin-top:8px;">
+              <ul class="man-list">
                 <li>IEC 62271-100은 표준 시험 조건으로 특정 τ 값(45 ms, 60 ms 등)을 규정하며, 이는 실계통의 대표적인 X/R을 반영합니다.</li>
                 <li>τ 값이 커질수록 전류 피크 계수(κ)가 증가합니다.
-                  <table style="margin-top:8px; border-collapse:collapse; font-family:var(--mono); font-size:0.814rem; color:var(--mu);">
-                    <thead>
-                      <tr style="border-bottom:1px solid var(--bd);">
-                        <th style="padding:5px 14px 5px 0; font-weight:600; color:var(--tx);">τ 조건</th>
-                        <th style="padding:5px 14px; font-weight:600; color:var(--tx);">50Hz</th>
-                        <th style="padding:5px 14px; font-weight:600; color:var(--tx);">60Hz</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr style="border-bottom:1px solid var(--bd);">
-                        <td style="padding:5px 14px 5px 0;">τ &lt; 60ms</td>
-                        <td style="padding:5px 14px; color:var(--acc); font-weight:700;">κ = 2.5</td>
-                        <td style="padding:5px 14px; color:var(--acc); font-weight:700;">κ = 2.6</td>
-                      </tr>
-                      <tr style="border-bottom:1px solid var(--bd);">
-                        <td style="padding:5px 14px 5px 0;">τ = 60ms</td>
-                        <td style="padding:5px 14px; color:var(--acc); font-weight:700;">κ = 2.6</td>
-                        <td style="padding:5px 14px; color:var(--acc); font-weight:700;">κ = 2.7</td>
-                      </tr>
-                      <tr>
-                        <td style="padding:5px 14px 5px 0;">τ &gt; 60ms</td>
-                        <td style="padding:5px 14px; color:var(--acc); font-weight:700;">κ = 2.7</td>
-                        <td style="padding:5px 14px; color:var(--acc); font-weight:700;">κ = 2.7</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <div class="tbl-scroll" style="margin-top:8px;">
+                    <table class="man-tbl">
+                      <colgroup>
+                        <col style="width:110px">
+                        <col style="width:90px">
+                        <col style="width:90px">
+                      </colgroup>
+                      <thead>
+                        <tr>
+                          <th>τ 조건</th>
+                          <th>50Hz</th>
+                          <th>60Hz</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>τ &lt; 60ms</td>
+                          <td style="text-align:center" class="hl-t1s">κ = 2.5</td>
+                          <td style="text-align:center" class="hl-t1s">κ = 2.6</td>
+                        </tr>
+                        <tr>
+                          <td>τ = 60ms</td>
+                          <td style="text-align:center" class="hl-t1s">κ = 2.6</td>
+                          <td style="text-align:center" class="hl-t1s">κ = 2.7</td>
+                        </tr>
+                        <tr>
+                          <td>τ &gt; 60ms</td>
+                          <td style="text-align:center" class="hl-t1s">κ = 2.7</td>
+                          <td style="text-align:center" class="hl-t1s">κ = 2.7</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </li>
                 <li>T100a 시험은 τ가 크고 DC 성분이 큰 조건(비대칭 전류)을 재현하며, 이 때 X/R ratio가 직접적으로 아킹 윈도우와 TRV 조건에 영향을 줍니다.</li>
               </ul>
