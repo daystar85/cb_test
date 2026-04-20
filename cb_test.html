@@ -17621,9 +17621,15 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         const umaEl      = document.getElementById('s-uma');
         const imaRmsEl   = document.getElementById('s-ima-rms');
         const imaPeakEl  = document.getElementById('s-ima-peak');
-        const umaTarget    = umaEl     ? (parseFloat(umaEl.textContent)     || 0) : 0;
-        const imaRmsTarget = imaRmsEl  ? (parseFloat(imaRmsEl.textContent)  || 0) : 0;
-        const imaPeakTarget = imaPeakEl ? (parseFloat(imaPeakEl.textContent) || 0) : 0;
+        let umaTarget    = umaEl     ? (parseFloat(umaEl.textContent)     || 0) : 0;
+        let imaRmsTarget = imaRmsEl  ? (parseFloat(imaRmsEl.textContent)  || 0) : 0;
+        let imaPeakTarget = imaPeakEl ? (parseFloat(imaPeakEl.textContent) || 0) : 0;
+        if (Ur && Isc) {
+          const _pf = (activeTau > 60) ? 2.7 : (activeTau === 60) ? (fr === 50 ? 2.6 : 2.7) : (fr === 50 ? 2.5 : 2.6);
+          if (!umaTarget)     umaTarget     = Ur * Math.sqrt(2) / Math.sqrt(3);
+          if (!imaRmsTarget)  imaRmsTarget  = Isc;
+          if (!imaPeakTarget) imaPeakTarget = Isc * _pf;
+        }
         if (umaTarget <= 0 && imaRmsTarget <= 0 && imaPeakTarget <= 0) return;
 
         const makeTab = 't100s-make';
