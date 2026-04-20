@@ -2012,6 +2012,18 @@
       display: block;
     }
 
+    /* ═══ MANUAL PAGE TRANSITION ═══ */
+    #page-manual {
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 1s ease, transform 1s cubic-bezier(0.25, 1, 0.3, 1);
+    }
+
+    #page-manual.page-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     /* ═══ RESPONSIVE ═══ */
     @media (max-width: 360px) {
       .rval {
@@ -2608,6 +2620,39 @@
       color: var(--mu);
       font-family: var(--mono);
       font-size: 0.786rem;
+    }
+
+    .man-note + .man-note {
+      margin-top: 10px;
+      margin-bottom: 0;
+    }
+
+    .man-note:last-child {
+      margin-bottom: 0;
+    }
+
+    .man-note > .man-list {
+      margin-top: 8px;
+    }
+
+    .man-formula {
+      background: var(--sf2);
+      border: 1px solid var(--bd);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-top: 8px;
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      line-height: 2;
+      color: var(--tx);
+    }
+
+    .man-img-cap {
+      font-size: 0.714rem;
+      color: var(--mu);
+      font-family: var(--mono);
+      text-align: center;
+      margin-top: 6px;
     }
 
     /* Scrollable table wrapper */
@@ -10618,7 +10663,7 @@
               <img
                 src="data:image/webp;base64,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"
                 alt="th 파형 정의도" style="width:100%;max-width:420px;display:block;margin:0 auto;border-radius:4px;" />
-              <div class="edu-svg-cap">i : 차단전류 &nbsp;|&nbsp; i<sub>h</sub> : 주입전류(중첩구간) &nbsp;|&nbsp; i<sub>p</sub> :
+              <div class="man-img-cap">i : 차단전류 &nbsp;|&nbsp; i<sub>h</sub> : 주입전류(중첩구간) &nbsp;|&nbsp; i<sub>p</sub> :
                 주입전류(단독구간) &nbsp;|&nbsp; t<sub>h</sub> : 주입시간 &nbsp;|&nbsp; T<sub>h</sub> : 반주기</div>
             </div>
             <ul class="man-list">
@@ -10900,66 +10945,73 @@
               X/R 값이 클수록 DC 오프셋이 크고 오래 지속되어, 차단기가 경험하는 비대칭 전류가 더 가혹해집니다.
             </div>
 
-            <div class="man-note" style="margin-top:10px;">
+            <div class="man-note">
               <b>정의 및 계산식</b><br>
-              <div style="background:var(--sf2); border:1px solid var(--bd); border-radius:8px; padding:14px 18px; margin-top:8px; font-family:var(--mono); font-size:0.929rem;">
+              <div class="man-formula">
                 X/R = ω × τ = 2π × f × τ
               </div>
-              <ul class="man-list" style="margin-top:10px;">
+              <ul class="man-list">
                 <li><b>ω</b> : 각주파수 (rad/s) = 2πf</li>
                 <li><b>f</b> : 계통 주파수 (Hz)</li>
                 <li><b>τ</b> : DC 시정수 (s) — 직류 성분이 1/e ≈ 36.8% 로 감소하는 데 걸리는 시간</li>
               </ul>
             </div>
 
-            <div class="man-note" style="margin-top:10px; border-left-color: var(--acc);">
+            <div class="man-note">
               <b>계산 예시</b><br>
-              <div style="background:var(--sf2); border:1px solid var(--bd); border-radius:8px; padding:14px 18px; margin-top:8px; font-family:var(--mono); font-size:0.929rem; line-height:2;">
+              <div class="man-formula">
                 f = 60 Hz, τ = 45 ms = 0.045 s<br>
                 X/R = 2π × 60 × 0.045 ≈ <b style="color:var(--acc); font-size:1.05rem;">17</b>
               </div>
             </div>
 
-            <div class="man-note" style="margin-top:10px;">
+            <div class="man-note">
               <b>물리적 의미</b>
-              <ul class="man-list" style="margin-top:8px;">
+              <ul class="man-list">
                 <li>단락 사고 시 전류는 교류 성분(AC)과 직류 성분(DC)의 합성으로 나타납니다. DC 성분의 초기값과 감쇠 속도는 X/R에 의해 결정됩니다.</li>
                 <li>X/R이 클수록 DC 성분이 느리게 감쇠 → 전류 영점(current zero)이 늦게 발생 → 아크 지속 시간 증가 → 차단기에 가혹한 조건</li>
                 <li>X/R이 작을수록 DC 성분이 빠르게 감쇠 → 비교적 빠른 전류 영점 → 상대적으로 유리한 차단 조건</li>
               </ul>
             </div>
 
-            <div class="man-note" style="margin-top:10px;">
+            <div class="man-note">
               <b>IEC 시험과의 관계</b>
-              <ul class="man-list" style="margin-top:8px;">
+              <ul class="man-list">
                 <li>IEC 62271-100은 표준 시험 조건으로 특정 τ 값(45 ms, 60 ms 등)을 규정하며, 이는 실계통의 대표적인 X/R을 반영합니다.</li>
                 <li>τ 값이 커질수록 전류 피크 계수(κ)가 증가합니다.
-                  <table style="margin-top:8px; border-collapse:collapse; font-family:var(--mono); font-size:0.814rem; color:var(--mu);">
-                    <thead>
-                      <tr style="border-bottom:1px solid var(--bd);">
-                        <th style="padding:5px 14px 5px 0; font-weight:600; color:var(--tx);">τ 조건</th>
-                        <th style="padding:5px 14px; font-weight:600; color:var(--tx);">50Hz</th>
-                        <th style="padding:5px 14px; font-weight:600; color:var(--tx);">60Hz</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr style="border-bottom:1px solid var(--bd);">
-                        <td style="padding:5px 14px 5px 0;">τ &lt; 60ms</td>
-                        <td style="padding:5px 14px; color:var(--acc); font-weight:700;">κ = 2.5</td>
-                        <td style="padding:5px 14px; color:var(--acc); font-weight:700;">κ = 2.6</td>
-                      </tr>
-                      <tr style="border-bottom:1px solid var(--bd);">
-                        <td style="padding:5px 14px 5px 0;">τ = 60ms</td>
-                        <td style="padding:5px 14px; color:var(--acc); font-weight:700;">κ = 2.6</td>
-                        <td style="padding:5px 14px; color:var(--acc); font-weight:700;">κ = 2.7</td>
-                      </tr>
-                      <tr>
-                        <td style="padding:5px 14px 5px 0;">τ &gt; 60ms</td>
-                        <td style="padding:5px 14px; color:var(--acc); font-weight:700;">κ = 2.7</td>
-                        <td style="padding:5px 14px; color:var(--acc); font-weight:700;">κ = 2.7</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <div class="tbl-scroll" style="margin-top:8px;">
+                    <table class="man-tbl">
+                      <colgroup>
+                        <col style="width:110px">
+                        <col style="width:90px">
+                        <col style="width:90px">
+                      </colgroup>
+                      <thead>
+                        <tr>
+                          <th>τ 조건</th>
+                          <th>50Hz</th>
+                          <th>60Hz</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>τ &lt; 60ms</td>
+                          <td style="text-align:center" class="hl-t1s">κ = 2.5</td>
+                          <td style="text-align:center" class="hl-t1s">κ = 2.6</td>
+                        </tr>
+                        <tr>
+                          <td>τ = 60ms</td>
+                          <td style="text-align:center" class="hl-t1s">κ = 2.6</td>
+                          <td style="text-align:center" class="hl-t1s">κ = 2.7</td>
+                        </tr>
+                        <tr>
+                          <td>τ &gt; 60ms</td>
+                          <td style="text-align:center" class="hl-t1s">κ = 2.7</td>
+                          <td style="text-align:center" class="hl-t1s">κ = 2.7</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </li>
                 <li>T100a 시험은 τ가 크고 DC 성분이 큰 조건(비대칭 전류)을 재현하며, 이 때 X/R ratio가 직접적으로 아킹 윈도우와 TRV 조건에 영향을 줍니다.</li>
               </ul>
@@ -11039,7 +11091,7 @@
         } else if (cleanT === 'SPF' || cleanT === 'DEF') {
           min = target * 0.8; max = target * 1.2; tolStr = '±20%';
         } else if (cleanT === 'L90') {
-          min = target; max = target * 0.92 / 0.90; tolStr = '90~92% of STC\'s';
+          min = target; max = target * 0.95 / 0.90; tolStr = '90~95% of STC\'s';
         } else if (cleanT === 'L75') {
           min = target * 0.71 / 0.75; max = target * 0.79 / 0.75; tolStr = '71~79% of STC\'s';
         } else {
@@ -11060,7 +11112,7 @@
           min = target; max = target * 1.15; tolStr = '0 ~ +15%';
         }
       } else if (field === 'didt') {
-        if (cleanT === 'T100S') {
+        if (cleanT === 'T100S' || cleanT === 'T100A') {
           min = target; max = target * 1.05; tolStr = '0 ~ +5%';
         } else if (cleanT === 'L90') {
           min = target; max = target * 0.92 / 0.90; tolStr = '90~92% of STC\'s';
@@ -14046,7 +14098,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       document.body.classList.remove('manual-mode');
       document.body.classList.add('calc-mode');
       const pm1 = document.getElementById('page-manual');
-      if (pm1) pm1.style.display = 'none';
+      if (pm1) { pm1.classList.remove('page-visible'); pm1.style.display = 'none'; }
       const pset1 = document.getElementById('page-settings');
       if (pset1) pset1.style.display = 'none';
       ['page-settings-data', 'page-settings-adv', 'page-settings-plan'].forEach(id => {
@@ -14095,7 +14147,11 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       if (pt0) pt0.style.display = 'none';
       document.getElementById('card-input').style.display = 'none';
       const pm2 = document.getElementById('page-manual');
-      if (pm2) pm2.style.display = 'block';
+      if (pm2) {
+        pm2.classList.remove('page-visible');
+        pm2.style.display = 'block';
+        requestAnimationFrame(() => requestAnimationFrame(() => pm2.classList.add('page-visible')));
+      }
       document.getElementById('main-tabs').style.display = 'none';
       document.getElementById('rec-test-tabs').style.display = 'none';
       document.getElementById('header-search-wrap').style.display = 'block';
@@ -14118,7 +14174,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       localStorage.setItem('cb_active_mode', 'record');
       document.body.classList.remove('manual-mode');
       const pm = document.getElementById('page-manual');
-      if (pm) pm.style.display = 'none';
+      if (pm) { pm.classList.remove('page-visible'); pm.style.display = 'none'; }
       const pset3 = document.getElementById('page-settings');
       if (pset3) pset3.style.display = 'none';
       ['page-settings-data', 'page-settings-adv', 'page-settings-plan'].forEach(id => {
@@ -14161,7 +14217,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       document.body.classList.remove('calc-mode');
       localStorage.setItem('cb_active_mode', 'tools');
       const pm = document.getElementById('page-manual');
-      if (pm) pm.style.display = 'none';
+      if (pm) { pm.classList.remove('page-visible'); pm.style.display = 'none'; }
       const ps = document.getElementById('page-settings');
       if (ps) ps.style.display = 'none';
       ['page-settings-data', 'page-settings-adv', 'page-settings-plan'].forEach(id => {
@@ -14232,7 +14288,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       document.body.classList.remove('manual-mode');
       document.body.classList.remove('calc-mode');
       const pm = document.getElementById('page-manual');
-      if (pm) pm.style.display = 'none';
+      if (pm) { pm.classList.remove('page-visible'); pm.style.display = 'none'; }
       const pt2 = document.getElementById('page-tools');
       if (pt2) pt2.style.display = 'none';
       ['page-btf', 'page-t1s', 'page-t1a', 'page-slf', 'page-op2', 'page-spf', 'page-lccb', 'page-sr', 'page-stc', 'page-record'].forEach(id => {
@@ -15003,7 +15059,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       let warnDir = null; // 'low' | 'high'
 
       const IBR_MAP  = { t10: 'b-ibr',  t30: 'b-ibr',  t60: 'b-ibr',  t100s: 's-ibr', t100a: 'a-ibr', l90: 'slf-ibr', l75: 'slf-ibr' };
-      const TRV_MAP  = { t10: 'b-uc',   t30: 'b-uc',   t60: 'b-uc',   t100s: 's-uc',  t100a: 'a-uc',  l90: 'slf-ut',  l75: 'slf-ut',  vc: 'v-uc', op2: 'op2-uc' };
+      const TRV_MAP  = { t10: 'b-uc',   t30: 'b-uc',   t60: 'b-uc',   t100s: 's-uc',  t100a: 'a-uc',  l90: 'slf-um',  l75: 'slf-um',  vc: 'v-uc', op2: 'op2-uc' };
       const DIDT_MAP = { t10: 'b-didt', t30: 'b-didt', t60: 'b-didt', t100s: 's-didt', t100a: 'a-didt', l90: 'slf-didt-src', l75: 'slf-didt-src', op2: 'op2-didt', spf: 'spf-didt' };
       const ITH_MAP  = {}; // Ith는 고정 규정값(200~500μs)으로 검증, DOM 참조 불필요
       const UMA_MAP      = { t100s: 's-uma',     op2: 'op2-uin' };
@@ -15039,13 +15095,23 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
           }
         }
         else if ((cLow.includes('trv') || cLow.includes('uc') || cLow.includes('um')) && opts.trv) {
-          // Uc / Um: -5% ~ +20%
           const tId = TRV_MAP[tab];
           if (tId) {
-            const tVal = parseFloat(document.getElementById(tId)?.textContent || '0');
+            const _Ur  = parseFloat(document.getElementById('inp-ur')?.value)  || 0;
+            const _Isc = parseFloat(document.getElementById('inp-isc')?.value) || 0;
+            const _fr  = parseFloat(document.getElementById('inp-fr')?.value)  || 60;
+            let tVal;
+            if ((tab === 'l90' || tab === 'l75') && _Ur && _Isc) {
+              const _Z = 450, _kaf = 1.4, _tdL = _Ur >= 245 ? 0.5 : 0.2, _pct = tab === 'l90' ? 90 : 75;
+              tVal = slfCalc(_Ur, _Isc, _fr, _Z, _tdL, _kaf, _pct).um;
+            } else {
+              tVal = parseFloat(document.getElementById(tId)?.textContent || '');
+            }
             if (tVal > 0) {
-              if (val < tVal * 0.95)      warnDir = 'low';
-              else if (val > tVal * 1.20) warnDir = 'high';
+              const loFactor = (tab === 'l90' || tab === 'l75') ? 1.0 : 0.95;
+              const hiFactor = (tab === 'l90' || tab === 'l75') ? (_Ur > 72.5 ? 1.05 : 1.10) : 1.20;
+              if (val < tVal * loFactor)      warnDir = 'low';
+              else if (val > tVal * hiFactor) warnDir = 'high';
             }
           }
         }
@@ -15063,13 +15129,18 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
           }
         }
         else if (cLow.includes('di/dt') && opts.didt) {
-          // di/dt: ±15%
           const tId = DIDT_MAP[tab];
           if (tId) {
             const tVal = parseFloat(document.getElementById(tId)?.textContent || '0');
             if (tVal > 0) {
-              if (val < tVal * 0.85)      warnDir = 'low';
-              else if (val > tVal * 1.15) warnDir = 'high';
+              if (tab === 't100s' || tab === 't100a') {
+                // 0 ~ +5%
+                if (val < tVal)             warnDir = 'low';
+                else if (val > tVal * 1.05) warnDir = 'high';
+              } else {
+                if (val < tVal * 0.85)      warnDir = 'low';
+                else if (val > tVal * 1.15) warnDir = 'high';
+              }
             }
           }
         }
@@ -15100,20 +15171,24 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
           }
         }
         else if (cLow.includes('ima') && cLow.includes('kap') && opts.ipeak) {
-          // Ima(kAp) — making peak current: ≥95% of target
+          // Ima(kAp) — T100s 투입: 0 ~ +5%
           const tId = IMA_PEAK_MAP[tab];
           if (tId) {
             const tVal = parseFloat(document.getElementById(tId)?.textContent || '0');
-            if (tVal > 0 && val < tVal * 0.95) warnDir = 'low';
+            if (tVal > 0) {
+              if (val < tVal)             warnDir = 'low';
+              else if (val > tVal * 1.05) warnDir = 'high';
+            }
           }
         }
         else if (cLow.includes('ima') && cLow.includes('karms') && opts.irms) {
-          // Ima(kArms) — making current rms: 0 ~ +10%
+          // Ima(kArms) — T100s 투입: 0 ~ +10%
           const tId = IMA_RMS_MAP[tab];
           if (tId) {
             const tVal = parseFloat(document.getElementById(tId)?.textContent || '0');
             if (tVal > 0) {
-              if (val < tVal * 0.95)      warnDir = 'low';
+              const loFactor = (tab === 't100s') ? 1.0 : 0.95;
+              if (val < tVal * loFactor)  warnDir = 'low';
               else if (val > tVal * 1.10) warnDir = 'high';
             }
           }
@@ -17237,7 +17312,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         if (!tab.startsWith('stc') && (!Ur || !Isc)) return;
         const ibr_nom = Isc * (ratio[tab] || 1.0);
         const ibrTol  = (tab==='t100s'||tab==='t100a') ? [0,0.05]
-          : tab==='l90' ? [-0.01,0.02] : tab==='l75' ? [-0.04,0.04]
+          : tab==='l90' ? [0, 0.95/0.90-1] : tab==='l75' ? [-0.04,0.04]
           : (tab==='t10'||tab==='t30') ? [-0.20,0.20]
           : tab==='t60' ? [-0.10,0.10] : [0,0.10];
         const ibrMin  = ibr_nom*(1+ibrTol[0]), ibrMax = ibr_nom*(1+ibrTol[1]);
@@ -17247,6 +17322,12 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         else if (tab==='t30')  ucNom = Ur*kpp*1.54*S23;
         else if (tab==='t60')  ucNom = Ur*kpp*1.5*S23;
         else if (tab==='t100s'||tab==='t100a') ucNom = Ur*kpp*1.4*S23;
+        else if (tab==='l90'||tab==='l75') {
+          if (Ur && Isc) {
+            const _Z = 450, _kaf = 1.4, _tdL = Ur >= 245 ? 0.5 : 0.2, _pct = tab === 'l90' ? 90 : 75;
+            ucNom = slfCalc(Ur, Isc, fr, _Z, _tdL, _kaf, _pct).um;
+          }
+        }
         const ucMin = ucNom ? ucNom : null;  // Uc: 0% ~ +5% (Ur>72.5) or +10%
         const ucMax = ucNom ? ucNom*(Ur>72.5?1.05:1.10) : null;
 
@@ -17275,11 +17356,11 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
           const ref = didtEl ? (parseFloat(didtEl.textContent||'0')||didtNom) : didtNom;
           if (ref>0) {
             let didtMin, didtMax;
-            if (tab==='t100s')             { didtMin=ref;      didtMax=ref*1.05; }  // 0~+5%
+            if (tab==='t100s'||tab==='t100a') { didtMin=ref;      didtMax=ref*1.05; }  // 0~+5%
             else if (tab==='t60')          { didtMin=ref*0.90; didtMax=ref*1.10; }  // ±10%
             else if (tab==='l90')          { didtMin=ref*(0.90/0.90); didtMax=ref*(0.92/0.90); }  // 90~92% of STC
             else if (tab==='l75')          { didtMin=ref*(0.71/0.75); didtMax=ref*(0.79/0.75); }  // 71~79%
-            else                           { didtMin=ref*0.80; didtMax=ref*1.20; }  // ±20% (T10/T30/T100a/OP2/SPF)
+            else                           { didtMin=ref*0.80; didtMax=ref*1.20; }  // ±20% (T10/T30/OP2/SPF)
             markCell('di/dt', checkDir(getCellVal('di/dt'), didtMin, didtMax), rowNo, tab, didtMin, didtMax);
           }
         }
@@ -17531,6 +17612,89 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
                 }
               }
             }
+          }
+        }
+      })();
+
+      // ── T100s 투입시험 (Making) 검증 ──
+      (function validateT100sMaking() {
+        const umaEl      = document.getElementById('s-uma');
+        const imaRmsEl   = document.getElementById('s-ima-rms');
+        const imaPeakEl  = document.getElementById('s-ima-peak');
+        let umaTarget    = umaEl     ? (parseFloat(umaEl.textContent)     || 0) : 0;
+        let imaRmsTarget = imaRmsEl  ? (parseFloat(imaRmsEl.textContent)  || 0) : 0;
+        let imaPeakTarget = imaPeakEl ? (parseFloat(imaPeakEl.textContent) || 0) : 0;
+        if (Ur && Isc) {
+          const _pf = (activeTau > 60) ? 2.7 : (activeTau === 60) ? (fr === 50 ? 2.6 : 2.7) : (fr === 50 ? 2.5 : 2.6);
+          if (!umaTarget)     umaTarget     = Ur * Math.sqrt(2) / Math.sqrt(3);
+          if (!imaRmsTarget)  imaRmsTarget  = Isc;
+          if (!imaPeakTarget) imaPeakTarget = Isc * _pf;
+        }
+        if (umaTarget <= 0 && imaRmsTarget <= 0 && imaPeakTarget <= 0) return;
+
+        const makeTab = 't100s-make';
+        const warnTab = 't100s';
+        const isVert = (typeof orientState !== 'undefined' && orientState[makeTab] === 'v');
+
+        function checkAndMark(readCell, markCell, rowNo) {
+          if (umaTarget > 0) {
+            const v = readCell('uma');
+            const dir = checkDir(v, umaTarget * 0.966, null);
+            if (dir) markCell('Uma', dir, rowNo, umaTarget * 0.966, null);
+          }
+          if (imaRmsTarget > 0) {
+            const v = readCell('karms');
+            const dir = checkDir(v, imaRmsTarget, imaRmsTarget * 1.10);
+            if (dir) markCell('Ima(kArms)', dir, rowNo, imaRmsTarget, imaRmsTarget * 1.10);
+          }
+          if (imaPeakTarget > 0) {
+            const v = readCell('kap');
+            const dir = checkDir(v, imaPeakTarget, imaPeakTarget * 1.05);
+            if (dir) markCell('Ima(kAp)', dir, rowNo, imaPeakTarget, imaPeakTarget * 1.05);
+          }
+        }
+
+        if (!isVert) {
+          const tbl   = document.getElementById('tbl-' + makeTab);
+          const tbody = document.getElementById('tbody-' + makeTab);
+          if (!tbl || !tbody) return;
+          const colMap = {};
+          tbl.querySelectorAll('thead th').forEach((th, i) => { colMap[norm(th.textContent)] = i; });
+          const findIdx = (kw) => { const nkw = norm(kw); for (const k of Object.keys(colMap)) { if (k.includes(nkw)) return colMap[k]; } return -1; };
+          Array.from(tbody.querySelectorAll('tr')).forEach((tr, ri) => {
+            const tds = tr.querySelectorAll('td');
+            const readCell = (kw) => { const ci = findIdx(kw); if (ci < 0 || ci >= tds.length) return NaN; const inp = tds[ci].querySelector('input,textarea'); return inp ? parseFloat(inp.value) : NaN; };
+            const markCell = (colName, dir, rowNo, minVal, maxVal) => { const ci = findIdx(colName); markWarn(tds[ci], dir, colName, rowNo, warnTab, minVal, maxVal); };
+            checkAndMark(readCell, markCell, ri + 1);
+          });
+        } else {
+          const vtblWrap = document.getElementById('vtbl-wrap-' + makeTab);
+          if (!vtblWrap) return;
+          const vtbl = vtblWrap.querySelector('.rec-vtbl:not(.vtbl-sub)');
+          if (!vtbl) return;
+          const hdrThs = Array.from(vtbl.querySelectorAll('thead tr th'));
+          const nRecs  = hdrThs.length - 1;
+          if (nRecs <= 0) return;
+          const allRows = Array.from(vtbl.querySelectorAll('tbody tr'));
+          for (let recIdx = 0; recIdx < nRecs; recIdx++) {
+            const tdIdx = recIdx + 1;
+            const readCell = (kw) => {
+              const nkw = norm(kw);
+              const tr = allRows.find(r => norm(r.querySelector('td:first-child')?.textContent || '').includes(nkw));
+              if (!tr) return NaN;
+              const td = tr.querySelectorAll('td')[tdIdx];
+              if (!td) return NaN;
+              const inp = td.querySelector('input,textarea');
+              return inp ? parseFloat(inp.value) : NaN;
+            };
+            const markCell = (colName, dir, rowNo, minVal, maxVal) => {
+              const nkw = norm(colName);
+              const tr = allRows.find(r => norm(r.querySelector('td:first-child')?.textContent || '').includes(nkw));
+              if (!tr) return;
+              const td = tr.querySelectorAll('td')[tdIdx];
+              markWarn(td, dir, colName, rowNo, warnTab, minVal, maxVal);
+            };
+            checkAndMark(readCell, markCell, recIdx + 1);
           }
         }
       })();
