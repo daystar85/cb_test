@@ -15156,20 +15156,24 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
           }
         }
         else if (cLow.includes('ima') && cLow.includes('kap') && opts.ipeak) {
-          // Ima(kAp) — making peak current: ≥95% of target
+          // Ima(kAp) — T100s 투입: 0 ~ +5%
           const tId = IMA_PEAK_MAP[tab];
           if (tId) {
             const tVal = parseFloat(document.getElementById(tId)?.textContent || '0');
-            if (tVal > 0 && val < tVal * 0.95) warnDir = 'low';
+            if (tVal > 0) {
+              if (val < tVal)             warnDir = 'low';
+              else if (val > tVal * 1.05) warnDir = 'high';
+            }
           }
         }
         else if (cLow.includes('ima') && cLow.includes('karms') && opts.irms) {
-          // Ima(kArms) — making current rms: 0 ~ +10%
+          // Ima(kArms) — T100s 투입: 0 ~ +10%
           const tId = IMA_RMS_MAP[tab];
           if (tId) {
             const tVal = parseFloat(document.getElementById(tId)?.textContent || '0');
             if (tVal > 0) {
-              if (val < tVal * 0.95)      warnDir = 'low';
+              const loFactor = (tab === 't100s') ? 1.0 : 0.95;
+              if (val < tVal * loFactor)  warnDir = 'low';
               else if (val > tVal * 1.10) warnDir = 'high';
             }
           }
@@ -17587,6 +17591,83 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
                 }
               }
             }
+          }
+        }
+      })();
+
+      // ── T100s 투입시험 (Making) 검증 ──
+      (function validateT100sMaking() {
+        const umaEl      = document.getElementById('s-uma');
+        const imaRmsEl   = document.getElementById('s-ima-rms');
+        const imaPeakEl  = document.getElementById('s-ima-peak');
+        const umaTarget    = umaEl     ? (parseFloat(umaEl.textContent)     || 0) : 0;
+        const imaRmsTarget = imaRmsEl  ? (parseFloat(imaRmsEl.textContent)  || 0) : 0;
+        const imaPeakTarget = imaPeakEl ? (parseFloat(imaPeakEl.textContent) || 0) : 0;
+        if (umaTarget <= 0 && imaRmsTarget <= 0 && imaPeakTarget <= 0) return;
+
+        const makeTab = 't100s-make';
+        const warnTab = 't100s';
+        const isVert = (typeof orientState !== 'undefined' && orientState[makeTab] === 'v');
+
+        function checkAndMark(readCell, markCell, rowNo) {
+          if (umaTarget > 0) {
+            const v = readCell('uma');
+            const dir = checkDir(v, umaTarget * 0.966, null);
+            if (dir) markCell('Uma', dir, rowNo, umaTarget * 0.966, null);
+          }
+          if (imaRmsTarget > 0) {
+            const v = readCell('karms');
+            const dir = checkDir(v, imaRmsTarget, imaRmsTarget * 1.10);
+            if (dir) markCell('Ima(kArms)', dir, rowNo, imaRmsTarget, imaRmsTarget * 1.10);
+          }
+          if (imaPeakTarget > 0) {
+            const v = readCell('kap');
+            const dir = checkDir(v, imaPeakTarget, imaPeakTarget * 1.05);
+            if (dir) markCell('Ima(kAp)', dir, rowNo, imaPeakTarget, imaPeakTarget * 1.05);
+          }
+        }
+
+        if (!isVert) {
+          const tbl   = document.getElementById('tbl-' + makeTab);
+          const tbody = document.getElementById('tbody-' + makeTab);
+          if (!tbl || !tbody) return;
+          const colMap = {};
+          tbl.querySelectorAll('thead th').forEach((th, i) => { colMap[norm(th.textContent)] = i; });
+          const findIdx = (kw) => { const nkw = norm(kw); for (const k of Object.keys(colMap)) { if (k.includes(nkw)) return colMap[k]; } return -1; };
+          Array.from(tbody.querySelectorAll('tr')).forEach((tr, ri) => {
+            const tds = tr.querySelectorAll('td');
+            const readCell = (kw) => { const ci = findIdx(kw); if (ci < 0 || ci >= tds.length) return NaN; const inp = tds[ci].querySelector('input,textarea'); return inp ? parseFloat(inp.value) : NaN; };
+            const markCell = (colName, dir, rowNo, minVal, maxVal) => { const ci = findIdx(colName); markWarn(tds[ci], dir, colName, rowNo, warnTab, minVal, maxVal); };
+            checkAndMark(readCell, markCell, ri + 1);
+          });
+        } else {
+          const vtblWrap = document.getElementById('vtbl-wrap-' + makeTab);
+          if (!vtblWrap) return;
+          const vtbl = vtblWrap.querySelector('.rec-vtbl:not(.vtbl-sub)');
+          if (!vtbl) return;
+          const hdrThs = Array.from(vtbl.querySelectorAll('thead tr th'));
+          const nRecs  = hdrThs.length - 1;
+          if (nRecs <= 0) return;
+          const allRows = Array.from(vtbl.querySelectorAll('tbody tr'));
+          for (let recIdx = 0; recIdx < nRecs; recIdx++) {
+            const tdIdx = recIdx + 1;
+            const readCell = (kw) => {
+              const nkw = norm(kw);
+              const tr = allRows.find(r => norm(r.querySelector('td:first-child')?.textContent || '').includes(nkw));
+              if (!tr) return NaN;
+              const td = tr.querySelectorAll('td')[tdIdx];
+              if (!td) return NaN;
+              const inp = td.querySelector('input,textarea');
+              return inp ? parseFloat(inp.value) : NaN;
+            };
+            const markCell = (colName, dir, rowNo, minVal, maxVal) => {
+              const nkw = norm(colName);
+              const tr = allRows.find(r => norm(r.querySelector('td:first-child')?.textContent || '').includes(nkw));
+              if (!tr) return;
+              const td = tr.querySelectorAll('td')[tdIdx];
+              markWarn(td, dir, colName, rowNo, warnTab, minVal, maxVal);
+            };
+            checkAndMark(readCell, markCell, recIdx + 1);
           }
         }
       })();
