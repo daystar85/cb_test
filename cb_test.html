@@ -11091,7 +11091,7 @@
         } else if (cleanT === 'SPF' || cleanT === 'DEF') {
           min = target * 0.8; max = target * 1.2; tolStr = '±20%';
         } else if (cleanT === 'L90') {
-          min = target; max = target * 0.92 / 0.90; tolStr = '90~92% of STC\'s';
+          min = target; max = target * 0.95 / 0.90; tolStr = '90~95% of STC\'s';
         } else if (cleanT === 'L75') {
           min = target * 0.71 / 0.75; max = target * 0.79 / 0.75; tolStr = '71~79% of STC\'s';
         } else {
@@ -11112,7 +11112,7 @@
           min = target; max = target * 1.15; tolStr = '0 ~ +15%';
         }
       } else if (field === 'didt') {
-        if (cleanT === 'T100S') {
+        if (cleanT === 'T100S' || cleanT === 'T100A') {
           min = target; max = target * 1.05; tolStr = '0 ~ +5%';
         } else if (cleanT === 'L90') {
           min = target; max = target * 0.92 / 0.90; tolStr = '90~92% of STC\'s';
@@ -15119,13 +15119,18 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
           }
         }
         else if (cLow.includes('di/dt') && opts.didt) {
-          // di/dt: ±15%
           const tId = DIDT_MAP[tab];
           if (tId) {
             const tVal = parseFloat(document.getElementById(tId)?.textContent || '0');
             if (tVal > 0) {
-              if (val < tVal * 0.85)      warnDir = 'low';
-              else if (val > tVal * 1.15) warnDir = 'high';
+              if (tab === 't100s' || tab === 't100a') {
+                // 0 ~ +5%
+                if (val < tVal)             warnDir = 'low';
+                else if (val > tVal * 1.05) warnDir = 'high';
+              } else {
+                if (val < tVal * 0.85)      warnDir = 'low';
+                else if (val > tVal * 1.15) warnDir = 'high';
+              }
             }
           }
         }
@@ -17297,7 +17302,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         if (!tab.startsWith('stc') && (!Ur || !Isc)) return;
         const ibr_nom = Isc * (ratio[tab] || 1.0);
         const ibrTol  = (tab==='t100s'||tab==='t100a') ? [0,0.05]
-          : tab==='l90' ? [-0.01,0.02] : tab==='l75' ? [-0.04,0.04]
+          : tab==='l90' ? [0, 0.95/0.90-1] : tab==='l75' ? [-0.04,0.04]
           : (tab==='t10'||tab==='t30') ? [-0.20,0.20]
           : tab==='t60' ? [-0.10,0.10] : [0,0.10];
         const ibrMin  = ibr_nom*(1+ibrTol[0]), ibrMax = ibr_nom*(1+ibrTol[1]);
@@ -17335,11 +17340,11 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
           const ref = didtEl ? (parseFloat(didtEl.textContent||'0')||didtNom) : didtNom;
           if (ref>0) {
             let didtMin, didtMax;
-            if (tab==='t100s')             { didtMin=ref;      didtMax=ref*1.05; }  // 0~+5%
+            if (tab==='t100s'||tab==='t100a') { didtMin=ref;      didtMax=ref*1.05; }  // 0~+5%
             else if (tab==='t60')          { didtMin=ref*0.90; didtMax=ref*1.10; }  // ±10%
             else if (tab==='l90')          { didtMin=ref*(0.90/0.90); didtMax=ref*(0.92/0.90); }  // 90~92% of STC
             else if (tab==='l75')          { didtMin=ref*(0.71/0.75); didtMax=ref*(0.79/0.75); }  // 71~79%
-            else                           { didtMin=ref*0.80; didtMax=ref*1.20; }  // ±20% (T10/T30/T100a/OP2/SPF)
+            else                           { didtMin=ref*0.80; didtMax=ref*1.20; }  // ±20% (T10/T30/OP2/SPF)
             markCell('di/dt', checkDir(getCellVal('di/dt'), didtMin, didtMax), rowNo, tab, didtMin, didtMax);
           }
         }
