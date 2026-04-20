@@ -15059,7 +15059,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       let warnDir = null; // 'low' | 'high'
 
       const IBR_MAP  = { t10: 'b-ibr',  t30: 'b-ibr',  t60: 'b-ibr',  t100s: 's-ibr', t100a: 'a-ibr', l90: 'slf-ibr', l75: 'slf-ibr' };
-      const TRV_MAP  = { t10: 'b-uc',   t30: 'b-uc',   t60: 'b-uc',   t100s: 's-uc',  t100a: 'a-uc',  l90: 'slf-ut',  l75: 'slf-ut',  vc: 'v-uc', op2: 'op2-uc' };
+      const TRV_MAP  = { t10: 'b-uc',   t30: 'b-uc',   t60: 'b-uc',   t100s: 's-uc',  t100a: 'a-uc',  l90: 'slf-um',  l75: 'slf-um',  vc: 'v-uc', op2: 'op2-uc' };
       const DIDT_MAP = { t10: 'b-didt', t30: 'b-didt', t60: 'b-didt', t100s: 's-didt', t100a: 'a-didt', l90: 'slf-didt-src', l75: 'slf-didt-src', op2: 'op2-didt', spf: 'spf-didt' };
       const ITH_MAP  = {}; // Ith는 고정 규정값(200~500μs)으로 검증, DOM 참조 불필요
       const UMA_MAP      = { t100s: 's-uma',     op2: 'op2-uin' };
@@ -17312,6 +17312,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         else if (tab==='t30')  ucNom = Ur*kpp*1.54*S23;
         else if (tab==='t60')  ucNom = Ur*kpp*1.5*S23;
         else if (tab==='t100s'||tab==='t100a') ucNom = Ur*kpp*1.4*S23;
+        else if (tab==='l90'||tab==='l75') { const el = document.getElementById('slf-um'); if (el) ucNom = parseFloat(el.textContent) || null; }
         const ucMin = ucNom ? ucNom : null;  // Uc: 0% ~ +5% (Ur>72.5) or +10%
         const ucMax = ucNom ? ucNom*(Ur>72.5?1.05:1.10) : null;
 
