@@ -15095,13 +15095,15 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
           }
         }
         else if ((cLow.includes('trv') || cLow.includes('uc') || cLow.includes('um')) && opts.trv) {
-          // Uc / Um: -5% ~ +20%
           const tId = TRV_MAP[tab];
           if (tId) {
             const tVal = parseFloat(document.getElementById(tId)?.textContent || '0');
             if (tVal > 0) {
-              if (val < tVal * 0.95)      warnDir = 'low';
-              else if (val > tVal * 1.20) warnDir = 'high';
+              // L90/L75 Um: 0 ~ +10% (Ur≤72.5) or 0 ~ +5% (Ur>72.5)
+              const loFactor = (tab === 'l90' || tab === 'l75') ? 1.0 : 0.95;
+              const hiFactor = (tab === 'l90' || tab === 'l75') ? (Ur > 72.5 ? 1.05 : 1.10) : 1.20;
+              if (val < tVal * loFactor)      warnDir = 'low';
+              else if (val > tVal * hiFactor) warnDir = 'high';
             }
           }
         }
@@ -17318,7 +17320,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
 
         if (chk('ibr'))  markCell('Ibr',   checkDir(getCellVal('Ibr'),  ibrMin, ibrMax), rowNo, tab, ibrMin, ibrMax);
         if (chk('trv') && ucNom) {
-          const ucCol = (tab==='l90'||tab==='l75') ? 'TRV' : 'Uc';
+          const ucCol = (tab==='l90'||tab==='l75') ? 'Um' : 'Uc';
           markCell(ucCol, checkDir(getCellVal(ucCol), ucMin, ucMax), rowNo, tab, ucMin, ucMax);
         }
         if (chk('peak')) {
