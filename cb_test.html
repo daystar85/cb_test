@@ -17318,7 +17318,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
 
         if (chk('ibr'))  markCell('Ibr',   checkDir(getCellVal('Ibr'),  ibrMin, ibrMax), rowNo, tab, ibrMin, ibrMax);
         if (chk('trv') && ucNom) {
-          const ucCol = (tab==='l90'||tab==='l75') ? 'Um' : 'Uc';
+          const ucCol = (tab==='l90'||tab==='l75') ? 'TRV' : 'Uc';
           markCell(ucCol, checkDir(getCellVal(ucCol), ucMin, ucMax), rowNo, tab, ucMin, ucMax);
         }
         if (chk('peak')) {
