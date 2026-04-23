@@ -2755,6 +2755,11 @@
       background: rgba(255, 107, 53, 0.04);
     }
 
+    .man-tbl-compact {
+      min-width: 0;
+      width: auto;
+    }
+
     /* Highlight colors matching test type */
     .hl-t10 {
       color: var(--t10);
@@ -5543,7 +5548,8 @@
     <a class="toc-chip" data-idx="5" onclick="manGoto(5)">6. 멀티파트</a>
     <a class="toc-chip" data-idx="6" onclick="manGoto(6)">7. 유닛테스트</a>
     <a class="toc-chip" data-idx="7" onclick="manGoto(7)">8. Subsequent zero</a>
-    <a class="toc-chip" data-idx="8" onclick="manGoto(8)">9. 기타</a>
+    <a class="toc-chip" data-idx="8" onclick="manGoto(8)">9. X/R ratio</a>
+    <a class="toc-chip" data-idx="9" onclick="manGoto(9)">10. 기타</a>
   </div>
 
   <!-- ── BOTTOM NAV ── -->
@@ -8237,7 +8243,7 @@
             <div class="edu-section-title">✅ 판정 기준</div>
             <div class="edu-warn" style="margin-top: 10px; display: block; border-left: 4px solid var(--stc);">
               시험 후 아래 조건을 만족해야 'PASS'로 판정됩니다.
-              <br>1. <b>저항 증가율:</b> 시험 전 대비 <b>120% 이내</b> 유지
+              <br>1. <b>저항 증가율:</b> 시험 전 대비 <b>20% 이내</b> 유지
               <br>2. <b>기구 동작:</b> 시험 후 정상적인 <b>전동 개극</b> 가능 (수동 조작은 수동으로)
               <br>3. <b>외관 점검:</b> 용융, 변형이 없음
             </div>
@@ -10951,8 +10957,8 @@
               <ul class="man-list">
                 <li>IEC 62271-100은 표준 시험 조건으로 특정 τ 값(45 ms, 60 ms 등)을 규정하며, 이는 실계통의 대표적인 X/R을 반영합니다.</li>
                 <li>τ 값이 커질수록 전류 피크 계수(κ)가 증가합니다.
-                  <div class="tbl-scroll" style="margin-top:8px;">
-                    <table class="man-tbl">
+                  <div class="tbl-scroll" style="margin-top:8px; width:fit-content;">
+                    <table class="man-tbl man-tbl-compact">
                       <colgroup>
                         <col style="width:110px">
                         <col style="width:90px">
@@ -11163,6 +11169,7 @@
         'spf-formulas', 'spf-guide',
         'lccb-formulas', 'lccb-guide',
         'sr-formulas', 'sr-guide',
+        'stc-guide',
         'annexe'
       ];
       keys.forEach(key => {
