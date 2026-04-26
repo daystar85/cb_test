@@ -17442,8 +17442,8 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       if (fr) ratingParts.push(`<span class="sum-val">${fr}</span><span class="sum-label"> Hz</span>`);
       if (ratingParts.length) html += `<span class="sum-row">${ratingParts.join('<span class="sum-label"> / </span>')}</span>`;
       const envParts = [];
-      if (gas) envParts.push(`<span class="sum-label">가스 </span><span class="sum-val">${gas}</span><span class="sum-label"> MPa</span>`);
       if (ground) envParts.push(`<span class="sum-val">${ground}</span>`);
+      if (gas) envParts.push(`<span class="sum-val">${gas}</span><span class="sum-label"> MPa</span>`);
       if (envParts.length) html += `<span class="sum-row">${envParts.join('<span class="sum-label"> · </span>')}</span>`;
 
       el.innerHTML = html || '<span class="sum-row" style="opacity:0.45;">과제 / 시험자 / 정격 / 환경</span>';
