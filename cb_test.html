@@ -849,26 +849,28 @@
       cursor: pointer;
     }
 
-    .fs-labels {
+    .fs-size-hints {
       display: flex;
       justify-content: space-between;
-      margin-top: 8px;
+      align-items: baseline;
+      margin-top: 6px;
+      padding: 0 11px;
     }
 
-    .fs-label {
+    .fs-hint-small {
       font-family: var(--mono);
-      font-size: 0.643rem;
+      font-size: 0.72rem;
       color: var(--mu);
-      text-align: center;
-      cursor: pointer;
-      transition: 1.0s;
-      line-height: 1.3;
-      flex: 1;
+      opacity: 0.6;
+      line-height: 1;
     }
 
-    .fs-label.active {
-      color: var(--acc);
+    .fs-hint-large {
+      font-family: var(--mono);
+      font-size: 1.35rem;
       font-weight: 700;
+      color: var(--acc);
+      line-height: 1;
     }
 
     .fs-preview {
@@ -2511,6 +2513,103 @@
     #split-confirm-btn { background: var(--acc); color: #fff; }
     #split-cancel-btn { background: var(--sf2); color: var(--tx); border: 1px solid var(--bd); }
 
+    #split-exit-row { display:none; }
+    #split-exit-btn {
+      width: 100%;
+      padding: 9px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,107,53,0.35);
+      background: rgba(255,107,53,0.08);
+      color: var(--acc);
+      font-family: var(--sans);
+      font-size: 0.786rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    #split-exit-btn:hover { background: rgba(255,107,53,0.18); }
+
+    /* ── 헤더 정격 pill 클릭 ── */
+    .rsb-chip.rsb-clickable {
+      cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s;
+      user-select: none;
+    }
+    .rsb-chip.rsb-clickable:hover {
+      background: rgba(255,107,53,0.12);
+      border-color: rgba(255,107,53,0.5);
+    }
+    .rsb-chip.rsb-clickable:hover span { color: var(--acc); }
+
+    /* ── 정격 빠른 입력 모달 ── */
+    #rating-quick-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      background: rgba(0,0,0,0.5);
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 56px;
+    }
+    #rating-quick-modal.open { display: flex; }
+    #rating-quick-box {
+      background: var(--sf);
+      border: 1px solid var(--bd);
+      border-radius: 14px;
+      width: 340px;
+      max-width: 92vw;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.45);
+      overflow: hidden;
+    }
+    #rating-quick-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--bd);
+    }
+    #rating-quick-title {
+      font-size: 0.929rem;
+      font-weight: 700;
+      color: var(--tx);
+    }
+    #rating-quick-close {
+      background: none;
+      border: none;
+      color: var(--mu);
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 6px;
+      line-height: 1;
+    }
+    #rating-quick-close:hover { background: var(--sf2); color: var(--tx); }
+    #rating-quick-body {
+      padding: 14px 16px;
+    }
+    #rating-quick-tabs {
+      display: flex;
+      border-top: 1px solid var(--bd);
+      background: var(--sf2);
+    }
+    .rqt-btn {
+      flex: 1;
+      padding: 9px 4px;
+      background: none;
+      border: none;
+      border-right: 1px solid var(--bd);
+      color: var(--mu);
+      font-family: var(--mono);
+      font-size: 0.786rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .rqt-btn:last-child { border-right: none; }
+    .rqt-btn:hover { background: var(--sf); color: var(--tx); }
+    .rqt-btn.active { background: var(--sf); color: var(--acc); border-top: 2px solid var(--acc); }
+
     /* split 레이아웃 */
     body.split-mode > main {
       display: flex !important;
@@ -2539,15 +2638,37 @@
     }
     body.split-mode #split-divider { display: block; }
     #split-divider:hover, #split-divider.dragging { background: var(--acc); }
-    #split-divider::after {
-      content: '⋮';
+
+    /* split 분할선 위 swap 버튼 */
+    #split-swap-btn {
+      display: none;
       position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid var(--bd);
+      background: var(--sf);
       color: var(--mu);
-      font-size: 1rem;
-      pointer-events: none;
+      font-size: 0.857rem;
+      cursor: pointer;
+      z-index: 20;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s, color .15s, border-color .15s, box-shadow .15s;
+      user-select: none;
+      line-height: 1;
     }
+    body.split-mode #split-swap-btn { display: flex; }
+    #split-swap-btn:hover {
+      background: var(--acc);
+      color: #fff;
+      border-color: var(--acc);
+      box-shadow: 0 0 10px rgba(255,107,53,0.4);
+    }
+    #split-swap-btn:active { transform: translate(-50%, -50%) scale(0.9); }
 
     /* split 모드에서 기록지 탭바 sticky */
     #split-right-pane .rec-test-tabs-inner {
@@ -5685,11 +5806,11 @@
         <div class="hd-title">차단시험</div>
       </div>
       <div id="rating-summary-bar">
-        <div class="rsb-chip"><span id="rsb-ur">—</span> kV</div>
-        <div class="rsb-chip"><span id="rsb-isc">—</span> kA</div>
-        <div class="rsb-chip"><span id="rsb-fr">—</span> Hz</div>
-        <div class="rsb-chip">kpp <span id="rsb-kpp">—</span></div>
-        <div class="rsb-chip"><span id="rsb-rs-tau">—</span> ms</div>
+        <div class="rsb-chip rsb-clickable" onclick="openRatingModal('ur')" title="정격전압 변경"><span id="rsb-ur">—</span> kV</div>
+        <div class="rsb-chip rsb-clickable" onclick="openRatingModal('isc')" title="차단전류 변경"><span id="rsb-isc">—</span> kA</div>
+        <div class="rsb-chip rsb-clickable" onclick="openRatingModal('fr')" title="주파수 변경"><span id="rsb-fr">—</span> Hz</div>
+        <div class="rsb-chip rsb-clickable" onclick="openRatingModal('earth')" title="접지조건 변경">kpp <span id="rsb-kpp">—</span></div>
+        <div class="rsb-chip rsb-clickable" onclick="openRatingModal('tau')" title="시정수 변경"><span id="rsb-rs-tau">—</span> ms</div>
       </div>
     </div>
     <!-- 계산기 탭 (기본 표시) -->
@@ -5774,7 +5895,7 @@
   <!-- 분할 보기 선택 모달 -->
   <div id="split-modal">
     <div id="split-modal-box">
-      <h3>🖥 분할 보기 설정</h3>
+      <h3 id="split-modal-title">🖥 분할 보기 설정</h3>
       <div class="split-panel-label">왼쪽 패널</div>
       <div class="split-panel-opts" id="split-left-opts">
         <button class="split-opt-btn selected" data-v="calc" onclick="selectSplitOpt('left','calc',this)">⚡ 계산기</button>
@@ -5791,8 +5912,108 @@
         <button id="split-cancel-btn" onclick="closeSplitModal()">취소</button>
         <button id="split-confirm-btn" onclick="confirmSplitView()">분할 보기 시작</button>
       </div>
+      <div id="split-exit-row" style="display:none; margin-top:8px;">
+        <button id="split-exit-btn" onclick="closeSplitModal();exitSplitView()">✕ 분할 보기 종료</button>
+      </div>
       <div id="split-same-warn" style="display:none; margin-top:10px; padding:8px 12px; border-radius:8px; background:rgba(255,107,53,0.12); border:1px solid rgba(255,107,53,0.35); color:var(--acc); font-size:0.786rem; text-align:center;">
         ⚠️ 왼쪽과 오른쪽 패널이 동일합니다. 서로 다른 화면을 선택해 주세요.
+      </div>
+    </div>
+  </div>
+
+  <!-- 정격 빠른 입력 모달 -->
+  <div id="rating-quick-modal">
+    <div id="rating-quick-box">
+      <div id="rating-quick-header">
+        <span id="rating-quick-title">정격전압 Ur</span>
+        <button id="rating-quick-close" onclick="closeRatingModal()">✕</button>
+      </div>
+      <div id="rating-quick-body">
+        <!-- Ur -->
+        <div class="rqm-panel" id="rqm-panel-ur">
+          <div class="rating-opt-grid">
+            <button class="rating-opt-btn" id="rqm-btn-ur-72.5"  onclick="setUr(72.5)">72.5</button>
+            <button class="rating-opt-btn" id="rqm-btn-ur-145"   onclick="setUr(145)">145</button>
+            <button class="rating-opt-btn" id="rqm-btn-ur-170"   onclick="setUr(170)">170</button>
+            <button class="rating-opt-btn" id="rqm-btn-ur-245"   onclick="setUr(245)">245</button>
+            <button class="rating-opt-btn" id="rqm-btn-ur-300"   onclick="setUr(300)">300</button>
+            <button class="rating-opt-btn" id="rqm-btn-ur-362"   onclick="setUr(362)">362</button>
+            <button class="rating-opt-btn" id="rqm-btn-ur-420"   onclick="setUr(420)">420</button>
+            <button class="rating-opt-btn" id="rqm-btn-ur-550"   onclick="setUr(550)">550</button>
+            <button class="rating-opt-btn" id="rqm-btn-ur-800"   onclick="setUr(800)">800</button>
+          </div>
+          <div class="manual-input-box" style="margin-top:10px;">
+            <label>직접 입력 (kV)</label>
+            <div class="manual-input-wrap">
+              <input type="number" id="rqm-ur-manual" placeholder="0" oninput="onRqmUrManual(this)">
+              <span class="m-unit">kV</span>
+            </div>
+          </div>
+        </div>
+        <!-- Isc -->
+        <div class="rqm-panel" id="rqm-panel-isc" style="display:none;">
+          <div class="rating-opt-grid">
+            <button class="rating-opt-btn" id="rqm-btn-isc-31.5" onclick="setIsc(31.5)">31.5</button>
+            <button class="rating-opt-btn" id="rqm-btn-isc-40"   onclick="setIsc(40)">40</button>
+            <button class="rating-opt-btn" id="rqm-btn-isc-50"   onclick="setIsc(50)">50</button>
+            <button class="rating-opt-btn" id="rqm-btn-isc-63"   onclick="setIsc(63)">63</button>
+            <button class="rating-opt-btn" id="rqm-btn-isc-80"   onclick="setIsc(80)">80</button>
+          </div>
+          <div class="manual-input-box" style="margin-top:10px;">
+            <label>직접 입력 (kA)</label>
+            <div class="manual-input-wrap">
+              <input type="number" id="rqm-isc-manual" placeholder="0" oninput="onRqmIscManual(this)">
+              <span class="m-unit">kA</span>
+            </div>
+          </div>
+        </div>
+        <!-- Fr -->
+        <div class="rqm-panel" id="rqm-panel-fr" style="display:none;">
+          <div class="rating-opt-grid">
+            <button class="rating-opt-btn" id="rqm-btn-fr-50" onclick="setFr(50)">
+              <span>50 Hz</span><span class="desc">유럽, 중국 표준</span>
+            </button>
+            <button class="rating-opt-btn" id="rqm-btn-fr-60" onclick="setFr(60)">
+              <span>60 Hz</span><span class="desc">한국, 미국 표준</span>
+            </button>
+          </div>
+        </div>
+        <!-- Earth -->
+        <div class="rqm-panel" id="rqm-panel-earth" style="display:none;">
+          <div class="rating-opt-grid">
+            <button class="rating-opt-btn" id="rqm-btn-earth-eff" onclick="setEarth('eff')">
+              <span>유효접지(kpp=1.3)</span><span class="desc">Standard Eff. Grounded</span>
+            </button>
+            <button class="rating-opt-btn" id="rqm-btn-earth-non" onclick="setEarth('non')">
+              <span>비유효접지(kpp=1.5)</span><span class="desc">Non-Eff. Grounded</span>
+            </button>
+          </div>
+        </div>
+        <!-- Tau -->
+        <div class="rqm-panel" id="rqm-panel-tau" style="display:none;">
+          <div class="rating-opt-grid">
+            <button class="rating-opt-btn" id="rqm-btn-tau-45"  onclick="selectTau(45)">
+              <span>τ = 45 ms</span><span class="desc">IEC 표준 (Standard)</span>
+            </button>
+            <button class="rating-opt-btn" id="rqm-btn-tau-60"  onclick="selectTau(60)">
+              <span>τ = 60 ms</span><span class="desc">발전소 근방 (Near Gen)</span>
+            </button>
+            <button class="rating-opt-btn" id="rqm-btn-tau-75"  onclick="selectTau(75)">
+              <span>τ = 75 ms</span><span class="desc">대용량 계통 (Large)</span>
+            </button>
+            <button class="rating-opt-btn" id="rqm-btn-tau-120" onclick="selectTau(120)">
+              <span>τ = 120 ms</span><span class="desc">특수 계통 (Special)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- 항목 간 이동 탭 -->
+      <div id="rating-quick-tabs">
+        <button class="rqt-btn active" data-p="ur"    onclick="switchRatingPanel('ur')">Ur</button>
+        <button class="rqt-btn"        data-p="isc"   onclick="switchRatingPanel('isc')">Isc</button>
+        <button class="rqt-btn"        data-p="fr"    onclick="switchRatingPanel('fr')">Hz</button>
+        <button class="rqt-btn"        data-p="earth" onclick="switchRatingPanel('earth')">kpp</button>
+        <button class="rqt-btn"        data-p="tau"   onclick="switchRatingPanel('tau')">τ</button>
       </div>
     </div>
   </div>
@@ -5830,17 +6051,12 @@
             <div style="font-weight: 600; margin-bottom: 12px; color:var(--tx)">글자 크기 조정</div>
             <div class="fs-slider-wrap">
               <div class="fs-slider-track">
-                <input type="range" class="fs-slider" id="fs-slider" min="-2" max="4" step="1" value="0"
-                  oninput="applyFontScale(this.value)">
+                <input type="range" class="fs-slider" id="fs-slider" min="0" max="35" step="1" value="10"
+                  oninput="applyFontScaleFromSlider(this.value)">
               </div>
-              <div class="fs-labels">
-                <span class="fs-label" onclick="setFontScale(-2)">-2</span>
-                <span class="fs-label" onclick="setFontScale(-1)">-1</span>
-                <span class="fs-label" onclick="setFontScale(0)">0</span>
-                <span class="fs-label" onclick="setFontScale(1)">+1</span>
-                <span class="fs-label" onclick="setFontScale(2)">+2</span>
-                <span class="fs-label" onclick="setFontScale(3)">+3</span>
-                <span class="fs-label" onclick="setFontScale(4)">+4</span>
+              <div class="fs-size-hints">
+                <span class="fs-hint-small">A</span>
+                <span class="fs-hint-large">A</span>
               </div>
               <div class="fs-preview" id="fs-preview">
                 예시) Ibr : 40.0 kA · Uc : 523.3 kV · RRRV : 2.0 kV/μs
@@ -11848,7 +12064,9 @@
     </div><!-- /page-record -->
 
     </div><!-- /split-left-pane -->
-    <div id="split-divider"></div>
+    <div id="split-divider">
+      <button id="split-swap-btn" title="좌우 패널 교체" onclick="openSplitChangeModal()">⇄</button>
+    </div>
     <div id="split-right-pane" style="display:none;"></div>
   </main>
 
@@ -12815,7 +13033,7 @@
         'spf-formulas', 'spf-guide',
         'lccb-formulas', 'lccb-guide',
         'sr-formulas', 'sr-guide',
-        'stc-guide',
+        'stc-formulas', 'stc-guide',
         'vc-formulas', 'vc-guide',
         'annexe'
       ];
@@ -14140,13 +14358,15 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       document.getElementById('inp-tau').value = tau;
       document.getElementById('tau-summary').textContent = tau + 'ms';
       
-      // Update buttons
+      // Update buttons (card-input + rqm modal)
       [45, 60, 75, 120].forEach(t => {
         const btn = document.getElementById('btn-tau-' + t);
         if (btn) btn.classList.toggle('active', t === tau);
+        const rqmBtn = document.getElementById('rqm-btn-tau-' + t);
+        if (rqmBtn) rqmBtn.classList.toggle('active', t === tau);
       });
       
-      // Close accordion after selection by removing the class
+      // Close accordion and modal
       const wrap = document.getElementById('tau-accordion');
       if (wrap) wrap.classList.remove('open');
       
@@ -15821,6 +16041,35 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
 
     function openSplitModal() {
       if (_splitActive) { exitSplitView(); return; }
+      _openSplitModalUI(false);
+    }
+    function openSplitChangeModal() {
+      // 분할 중 패널 변경 모달 (⇄ 버튼에서 호출)
+      _openSplitModalUI(true);
+    }
+    function _openSplitModalUI(isChange) {
+      const title = document.getElementById('split-modal-title');
+      const confirmBtn = document.getElementById('split-confirm-btn');
+      const exitRow = document.getElementById('split-exit-row');
+
+      // 현재 상태를 모달 선택 버튼에 반영
+      ['left','right'].forEach(side => {
+        const key = side === 'left' ? _splitLeft : _splitRight;
+        document.querySelectorAll(`#split-${side}-opts .split-opt-btn`).forEach(b => {
+          b.classList.toggle('selected', b.dataset.v === key);
+        });
+      });
+
+      if (isChange) {
+        if (title) title.textContent = '🖥 분할 보기 변경';
+        if (confirmBtn) confirmBtn.textContent = '변경 적용';
+        if (exitRow) exitRow.style.display = 'block';
+      } else {
+        if (title) title.textContent = '🖥 분할 보기 설정';
+        if (confirmBtn) confirmBtn.textContent = '분할 보기 시작';
+        if (exitRow) exitRow.style.display = 'none';
+      }
+
       document.getElementById('split-modal').classList.add('open');
     }
     function closeSplitModal() {
@@ -15846,7 +16095,18 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       }
       if (warn) warn.style.display = 'none';
       closeSplitModal();
-      enterSplitView(_splitLeft, _splitRight);
+      if (_splitActive) {
+        // 분할 중 변경: 현재 비율 유지하면서 재진입
+        const lPane = document.getElementById('split-left-pane');
+        const total = document.querySelector('main').getBoundingClientRect().width;
+        let ratio = null;
+        if (lPane && total > 0) ratio = Math.round(lPane.getBoundingClientRect().width / total * 1000) / 1000;
+        _splitActive = false;
+        document.body.classList.remove('split-mode');
+        enterSplitView(_splitLeft, _splitRight, ratio);
+      } else {
+        enterSplitView(_splitLeft, _splitRight);
+      }
     }
 
     function _getPageEl(key) {
@@ -15921,6 +16181,12 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       if (hs0) hs0.style.display = 'none';
       const rt0 = document.getElementById('rec-test-tabs');
       if (rt0) rt0.style.display = 'none';
+      // 설정 페이지 카드들 모두 숨김
+      ['page-settings', 'page-settings-data', 'page-settings-adv', 'page-settings-plan'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.style.display = 'none';
+      });
+      // 매뉴얼 모드 클래스 제거 (man-toc 숨김)
+      document.body.classList.remove('manual-mode');
 
       // 각 패널에 페이지 마운트
       _mountPane(leftKey, lPane);
@@ -16013,7 +16279,124 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       showCalc();
     }
 
-    // 드래그 구분선
+    function swapSplitPanes() {
+      if (!_splitActive) return;
+      // 현재 비율 기억 (교체 후 반전)
+      const lPane = document.getElementById('split-left-pane');
+      const total = document.querySelector('main').getBoundingClientRect().width;
+      let ratio = null;
+      if (lPane && total > 0) {
+        ratio = lPane.getBoundingClientRect().width / total;
+      }
+      const newLeft  = _splitRight;
+      const newRight = _splitLeft;
+      _splitLeft  = newLeft;
+      _splitRight = newRight;
+      // 반전된 비율 (오른쪽 패널 너비 비율이 새 왼쪽 패널 비율)
+      const newRatio = ratio != null ? Math.round((1 - ratio) * 1000) / 1000 : null;
+      // 모달 버튼 상태도 갱신
+      document.querySelectorAll('#split-left-opts .split-opt-btn').forEach(b => {
+        b.classList.toggle('selected', b.dataset.v === newLeft);
+      });
+      document.querySelectorAll('#split-right-opts .split-opt-btn').forEach(b => {
+        b.classList.toggle('selected', b.dataset.v === newRight);
+      });
+      // 재진입으로 교체
+      _splitActive = false;
+      document.body.classList.remove('split-mode');
+      enterSplitView(newLeft, newRight, newRatio);
+    }
+
+    // ── 헤더 정격 pill 모달 ──
+    const _rqmMeta = {
+      ur:    { title: '정격전압 Ur (kV)',       panel: 'rqm-panel-ur'    },
+      isc:   { title: '차단전류 Isc (kA)',      panel: 'rqm-panel-isc'   },
+      fr:    { title: '정격주파수 (Hz)',         panel: 'rqm-panel-fr'    },
+      earth: { title: '중성점 접지조건',          panel: 'rqm-panel-earth' },
+      tau:   { title: 'DC 감쇠 시정수 τ (ms)', panel: 'rqm-panel-tau'   },
+    };
+    let _rqmActive = 'ur';
+
+    function openRatingModal(key) {
+      _syncRqmButtons();
+      switchRatingPanel(key);
+      document.getElementById('rating-quick-modal').classList.add('open');
+    }
+    function closeRatingModal() {
+      document.getElementById('rating-quick-modal').classList.remove('open');
+    }
+    function switchRatingPanel(key) {
+      _rqmActive = key;
+      // 패널 전환
+      Object.keys(_rqmMeta).forEach(k => {
+        const p = document.getElementById(_rqmMeta[k].panel);
+        if (p) p.style.display = k === key ? '' : 'none';
+      });
+      // 탭 활성화
+      document.querySelectorAll('.rqt-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.p === key);
+      });
+      // 타이틀
+      const title = document.getElementById('rating-quick-title');
+      if (title) title.textContent = _rqmMeta[key]?.title || '';
+    }
+    function _syncRqmButtons() {
+      // Ur
+      const urVal = document.getElementById('inp-ur')?.value;
+      document.querySelectorAll('#rqm-panel-ur .rating-opt-btn').forEach(b => {
+        b.classList.toggle('active', b.id === 'rqm-btn-ur-' + urVal);
+      });
+      const rqmUrM = document.getElementById('rqm-ur-manual');
+      if (rqmUrM) rqmUrM.value = urVal || '';
+      // Isc
+      const iscVal = document.getElementById('inp-isc')?.value;
+      document.querySelectorAll('#rqm-panel-isc .rating-opt-btn').forEach(b => {
+        b.classList.toggle('active', b.id === 'rqm-btn-isc-' + iscVal);
+      });
+      const rqmIscM = document.getElementById('rqm-isc-manual');
+      if (rqmIscM) rqmIscM.value = iscVal || '';
+      // Fr
+      const frVal = document.getElementById('inp-fr')?.value;
+      document.querySelectorAll('#rqm-panel-fr .rating-opt-btn').forEach(b => {
+        b.classList.toggle('active', b.id === 'rqm-btn-fr-' + frVal);
+      });
+      // Earth
+      const earthVal = document.getElementById('inp-earth')?.value;
+      document.querySelectorAll('#rqm-panel-earth .rating-opt-btn').forEach(b => {
+        b.classList.toggle('active', b.id === 'rqm-btn-earth-' + earthVal);
+      });
+      // Tau
+      const tauVal = document.getElementById('inp-tau')?.value;
+      document.querySelectorAll('#rqm-panel-tau .rating-opt-btn').forEach(b => {
+        b.classList.toggle('active', b.id === 'rqm-btn-tau-' + tauVal);
+      });
+    }
+    function onRqmUrManual(el) {
+      const val = parseFloat(el.value) || 0;
+      document.getElementById('inp-ur').value = val;
+      document.getElementById('ur-summary').textContent = val + 'kV';
+      document.getElementById('ur-manual').value = val;
+      document.querySelectorAll('#ur-accordion .rating-opt-btn, #rqm-panel-ur .rating-opt-btn').forEach(b => {
+        b.classList.toggle('active', b.id === 'btn-ur-' + val || b.id === 'rqm-btn-ur-' + val);
+      });
+      calcAll();
+    }
+    function onRqmIscManual(el) {
+      const val = parseFloat(el.value) || 0;
+      document.getElementById('inp-isc').value = val;
+      document.getElementById('isc-summary').textContent = val + 'kA';
+      document.getElementById('isc-manual').value = val;
+      document.querySelectorAll('#isc-accordion .rating-opt-btn, #rqm-panel-isc .rating-opt-btn').forEach(b => {
+        b.classList.toggle('active', b.id === 'btn-isc-' + val || b.id === 'rqm-btn-isc-' + val);
+      });
+      calcAll();
+    }
+    // 모달 배경 클릭 시 닫기
+    document.getElementById('rating-quick-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeRatingModal();
+    });
+
+    // ── 드래그 구분선
     (function () {
       let dragging = false, startX = 0, startW = 0;
       document.addEventListener('mousedown', e => {
@@ -16320,24 +16703,43 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
     applyTheme();
 
     // ── FONT SCALE ──────────────────────────────
-    const FS_STEPS = {
-      '-2': 0.82, '-1': 0.91, '0': 1,
-      '1': 1.1, '2': 1.2, '3': 1.32, '4': 1.45
-    };
+    // 저장값(fsVal): -2.0 ~ +5.0 실수 (0.2 단위, 기본 0)
+    // 슬라이더 인덱스: 0(=-2.0) ~ 35(=+5.0), 기본 10(=0.0)
+    const FS_MIN = -2.0, FS_MAX = 5.0, FS_STEP = 0.2;
+    const FS_STEPS_COUNT = Math.round((FS_MAX - FS_MIN) / FS_STEP); // 35
 
+    function _fsValToSlider(val) {
+      return Math.round((parseFloat(val) - FS_MIN) / FS_STEP);
+    }
+    function _fsSliderToVal(idx) {
+      return Math.round((FS_MIN + idx * FS_STEP) * 10) / 10;
+    }
+    function _fsValToScale(val) {
+      const v = parseFloat(val);
+      return Math.round((1 + v * 0.09) * 1000) / 1000;
+    }
+
+    // 슬라이더 oninput 전용 — 인덱스(0~35) 받음
+    function applyFontScaleFromSlider(idx) {
+      const fsVal = _fsSliderToVal(parseInt(idx, 10));
+      _applyFontScaleVal(fsVal);
+    }
+
+    // 저장값(-2.0~5.0) 또는 레거시 정수(-2~5) 받음
     function applyFontScale(val) {
-      val = parseInt(val, 10);
-      localStorage.setItem('ux_font_scale', val);
-      const scale = FS_STEPS[String(val)] || 1;
+      const num = parseFloat(val);
+      const fsVal = Math.max(FS_MIN, Math.min(FS_MAX, isNaN(num) ? 0 : num));
+      _applyFontScaleVal(fsVal);
+    }
+
+    function _applyFontScaleVal(fsVal) {
+      fsVal = Math.round(fsVal * 10) / 10; // 0.1 단위로 정규화
+      localStorage.setItem('ux_font_scale', String(fsVal));
+      const scale = _fsValToScale(fsVal);
       document.documentElement.style.setProperty('--fs-scale', scale);
 
       const slider = document.getElementById('fs-slider');
-      if (slider) slider.value = val;
-
-      const labels = document.querySelectorAll('.fs-label');
-      labels.forEach((el, i) => {
-        el.classList.toggle('active', (i - 2) === val);
-      });
+      if (slider) slider.value = _fsValToSlider(fsVal);
 
       const preview = document.getElementById('fs-preview');
       if (preview) preview.style.fontSize = (11 * scale) + 'px';
@@ -16351,7 +16753,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
     function updateSettingsSummary() {
       const themeMap = { dark: '🌙 다크', light: '☀️ 화이트', sepia: '📜 세피아' };
       const theme = themeMap[localStorage.getItem('ux_theme') || 'sepia'] || '세피아';
-      const fsVal = parseInt(localStorage.getItem('ux_font_scale') || '0', 10);
+      const fsVal = parseFloat(localStorage.getItem('ux_font_scale') || '0');
       const fsLabel = fsVal === 0 ? '기본' : (fsVal > 0 ? `+${fsVal}` : `${fsVal}`);
       const uxEl = document.getElementById('ux-summary');
       if (uxEl) uxEl.innerHTML =
@@ -16370,7 +16772,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
     }
 
     // Apply saved font scale on load
-    const _savedFs = parseInt(localStorage.getItem('ux_font_scale') || '0', 10);
+    const _savedFs = parseFloat(localStorage.getItem('ux_font_scale') || '0');
     applyFontScale(_savedFs);
 
     // ── DATA BACKUP & RESTORE ──
@@ -17994,23 +18396,29 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
 
     function recBuildWorkbook() {
       const data = recCollectData();
-      const i = data.info;
+      const activeTab = activeRecTab || 'noload';
+      const i = (data.infos || {})[activeTab] || {};
+      const _allInfoTabs = ['noload', 't10', 't30', 't60', 't100s', 't100a', 'l90', 'vc', 'l75', 'op2', 'spf', 'lccb', 'sr', 'stc'];
+      const _tabLabels = {
+        noload: '무부하', t10: 'T10', t30: 'T30', t60: 'T60',
+        t100s: 'T100s', t100a: 'T100a', l90: 'L90', vc: '절연확인',
+        l75: 'L75', op2: 'OP2', spf: 'SPF', lccb: 'LC/CC/BC', sr: 'SR', stc: 'STC'
+      };
       let wb = null;
       if (typeof XLSX !== 'undefined') {
         wb = XLSX.utils.book_new();
-        const activeTab = activeRecTab || 'noload';
-        const i = (data.infos || {})[activeTab] || data.info || {};
-        const infoRows = [
-          ['항목', '값'],
-          ['과제명', i.project], ['시험자', i.tester], ['시험일자', i.date],
-          ['정격전압(kV)', i.ur], ['정격차단전류(kA)', i.isc], ['주파수(Hz)', i.fr],
-          ['가스압력(MPa)', i.gas], ['접지조건', i.ground]
-        ];
-        // 모든 섹션의 추가 사항(메모) 동적 추가
-        NOTE_KEYS.forEach(tbl => {
-          const name = REC_SHEET_NAMES[tbl] || tbl;
-          if ((i.notes || {})[tbl]) {
-            infoRows.push([`추가 사항 (${name})`, i.notes[tbl]]);
+        // 탭별 시험정보를 모두 저장
+        const infoRows = [['시험', '과제명', '시험자', '시험일자', '정격전압(kV)', '정격차단전류(kA)', '주파수(Hz)', '가스압력(MPa)', '접지조건', '추가사항']];
+        _allInfoTabs.forEach(tab => {
+          const ti = (data.infos || {})[tab] || {};
+          const hasAny = ti.project || ti.tester || ti.date || ti.ur || ti.isc || ti.fr || ti.gas || ti.ground || ti.note;
+          if (hasAny) {
+            infoRows.push([
+              _tabLabels[tab] || tab,
+              ti.project || '', ti.tester || '', ti.date || '',
+              ti.ur || '', ti.isc || '', ti.fr || '',
+              ti.gas || '', ti.ground || '', ti.note || ''
+            ]);
           }
         });
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(infoRows), '시험정보');
@@ -18120,29 +18528,57 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
 
     /* ── xlsx 파싱 공통 ── */
     function _parseXlsxWorkbook(wb2) {
-      const d = { info: {}, tables: {}, merges: {} };
-      const ws0 = wb2.Sheets['\uc2dc\ud5d8\uc815\ubcf4'];
+      const d = { info: {}, infos: {}, tables: {}, merges: {} };
+      const ws0 = wb2.Sheets['시험정보'];
       if (ws0) {
-        const map = {
-          '\uacfc\uc81c\uba85': 'project', '\uc2dc\ud5d8\uc790': 'tester', '\uc2dc\ud5d8\uc77c\uc790': 'date',
-          '\uc815\uaca9\uc804\uc555(kV)': 'ur', '\uc815\uaca9\ucc28\ub2e8\uc804\ub958(kA)': 'isc', '\uc8fc\ud30c\uc218(Hz)': 'fr',
-          '\uac00\uc2a4\uc555\ub825(MPa)': 'gas', '\uc811\uc9c0\uc870\uac74': 'ground'
+        const rows = XLSX.utils.sheet_to_json(ws0, { header: 1 });
+        const _tabRevMap = {
+          '무부하': 'noload', 'T10': 't10', 'T30': 't30', 'T60': 't60',
+          'T100s': 't100s', 'T100a': 't100a', 'L90': 'l90', '절연확인': 'vc',
+          'L75': 'l75', 'OP2': 'op2', 'SPF': 'spf', 'LC/CC/BC': 'lccb', 'SR': 'sr', 'STC': 'stc'
         };
-        d.info.notes = {};
-        XLSX.utils.sheet_to_json(ws0, { header: 1 }).forEach(r => {
-          const key = String(r[0] || '').trim();
-          const val = String(r[1] || '').trim();
-          if (map[key]) {
-            d.info[map[key]] = val;
-          } else if (key.includes('\ucd94\uac00 \uc0ac\ud56d')) { // "추가 사항"
-            // REC_SHEET_NAMES를 순회하며 해당 행의 라벨에 시트 이름이 포함되어 있는지 확인 (Grep 방식)
-            Object.entries(REC_SHEET_NAMES).forEach(([tbl, sName]) => {
-              if (key.includes(sName)) {
-                d.info.notes[tbl] = val;
-              }
-            });
-          }
-        });
+        // 새 형식: 헤더행 첫 열이 '시험'
+        const firstRow = rows[0] || [];
+        if (String(firstRow[0] || '').trim() === '시험') {
+          // 새 형식: [시험, 과제명, 시험자, 시험일자, 정격전압, 정격차단전류, 주파수, 가스압력, 접지조건, 추가사항]
+          rows.slice(1).forEach(r => {
+            const tabLabel = String(r[0] || '').trim();
+            const tabKey = _tabRevMap[tabLabel];
+            if (!tabKey) return;
+            d.infos[tabKey] = {
+              project: String(r[1] || '').trim(),
+              tester:  String(r[2] || '').trim(),
+              date:    String(r[3] || '').trim(),
+              ur:      String(r[4] || '').trim(),
+              isc:     String(r[5] || '').trim(),
+              fr:      String(r[6] || '').trim(),
+              gas:     String(r[7] || '').trim(),
+              ground:  String(r[8] || '').trim(),
+              note:    String(r[9] || '').trim(),
+            };
+          });
+          // 구버전 호환용 d.info: 첫 번째 탭 정보로 채움
+          const firstInfoKey = Object.keys(d.infos)[0];
+          if (firstInfoKey) d.info = Object.assign({}, d.infos[firstInfoKey]);
+        } else {
+          // 구버전 형식: [항목, 값] 2열
+          const map = {
+            '과제명': 'project', '시험자': 'tester', '시험일자': 'date',
+            '정격전압(kV)': 'ur', '정격차단전류(kA)': 'isc', '주파수(Hz)': 'fr',
+            '가스압력(MPa)': 'gas', '접지조건': 'ground'
+          };
+          d.info.notes = {};
+          rows.forEach(r => {
+            const key = String(r[0] || '').trim();
+            const val = String(r[1] || '').trim();
+            if (map[key]) { d.info[map[key]] = val; }
+            else if (key.includes('추가 사항')) {
+              Object.entries(REC_SHEET_NAMES).forEach(([tbl, sName]) => {
+                if (key.includes(sName)) d.info.notes[tbl] = val;
+              });
+            }
+          });
+        }
       }
       const sm = {};
       Object.entries(REC_SHEET_NAMES).forEach(([tbl, sName]) => sm[sName] = tbl);
@@ -18484,7 +18920,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         recSetStatus('⚠ SheetJS 라이브러리 로딩 중... 잠시 후 다시 시도하세요.', ''); return;
       }
       const data = recCollectData();
-      const info = data.info;
+      const info = (data.infos || {})[testKey] || (data.infos || {})['noload'] || {};
       const MULTI_KEYS = {
         't100s': ['t100s-make', 't100s'],
         'op2': ['op2-make', 'op2'],
@@ -18713,7 +19149,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
             border: allBorders, fill: { fgColor: { rgb: WHITE } }
           });
         }
-        const noteValue = (info.notes || {})[testKey] || '';
+        const noteValue = info.note || (info.notes || {})[testKey] || '';
         const newlineCount = noteValue.split('\n').length;
         const charCount = noteValue.length;
         const estimatedWrapLines = Math.ceil(charCount / 100); // Rough estimate for chars per row in landscape
@@ -18760,8 +19196,23 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       XLSX.utils.book_append_sheet(wb, ws, 'Result');
       const dt = info.date || new Date().toISOString().slice(0, 10);
       const _keyLabel = {'noload':'NoLoad','t10':'T10','t30':'T30','t60':'T60','t100s':'T100s','t100s-make':'T100s-Make','t100a':'T100a','l90':'L90','vc':'VC','l75':'L75','op2-noload':'OP2-NoLoad','op2-make':'OP2-Make','op2':'OP2','spf':'SPF','lccb':'LCCB','sr':'SR'};
-      XLSX.writeFile(wb, (info.project || 'CB기록지') + '_' + (_keyLabel[testKey] || testKey) + '_' + dt + '.xlsx', { bookType: 'xlsx', type: 'binary', cellStyles: true });
-      recSetStatus('✅ Premium Excel 리포트 다운로드 완료', 'ok');
+      const defaultName = (info.project || 'CB기록지') + '_' + (_keyLabel[testKey] || testKey) + '_' + dt + '.xlsx';
+
+      if (window.showSaveFilePicker) {
+        window.showSaveFilePicker({
+          suggestedName: defaultName,
+          types: [{ description: 'Excel Workbook', accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] } }]
+        }).then(fh => {
+          const xlsxData = XLSX.write(wb, { bookType: 'xlsx', type: 'array', cellStyles: true });
+          return fh.createWritable().then(w => w.write(new Blob([xlsxData])).then(() => w.close()))
+            .then(() => recSetStatus('✅ Excel 리포트 저장 완료: ' + fh.name, 'ok'));
+        }).catch(err => {
+          if (err.name !== 'AbortError') recSetStatus('❌ 저장 오류: ' + err.message, 'err');
+        });
+      } else {
+        XLSX.writeFile(wb, defaultName, { bookType: 'xlsx', type: 'binary', cellStyles: true });
+        recSetStatus('✅ Excel 리포트 다운로드 완료', 'ok');
+      }
     }
 
     // ── ── PDF 리포트 내보내기 (통합형) ── ──
@@ -18911,7 +19362,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         [[_t('가스압력', 'Gas Press.'), info.gas ? info.gas + ' MPa' : '—'], [_t('접지조건', 'Grounding'), info.ground || '—']],
       ];
 
-      const noteVal = (info.notes || {})[testKey] || '';
+      const noteVal = info.note || (info.notes || {})[testKey] || '';
       const noteHtml = noteVal ? `<div class="section-hdr">${_t('특이사항 및 메모', 'Remarks & Notes')}</div><div class="note-box">${noteVal.replace(/\n/g, '<br>')}</div>` : '';
 
       const htmlContent = `<!DOCTYPE html>
@@ -18972,7 +19423,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
     // ── JSON으로 저장 (백업) ──
     function recSaveJSON() {
       const data = recCollectData();
-      const i = data.info;
+      const i = (data.infos || {})[activeRecTab || 'noload'] || {};
       const filename = (i.project || 'CB기록지') + '_' + (i.date || new Date().toISOString().slice(0, 10)) + '.json';
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -19811,6 +20262,10 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       document.querySelectorAll('#ur-accordion .rating-opt-btn').forEach(btn => {
         btn.classList.toggle('active', btn.id === 'btn-ur-' + val);
       });
+      document.querySelectorAll('#rqm-panel-ur .rating-opt-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.id === 'rqm-btn-ur-' + val);
+      });
+      const rqmM = document.getElementById('rqm-ur-manual'); if (rqmM) rqmM.value = val;
       document.getElementById('ur-accordion').classList.remove('open');
       calcAll();
     }
@@ -19832,6 +20287,10 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       document.querySelectorAll('#isc-accordion .rating-opt-btn').forEach(btn => {
         btn.classList.toggle('active', btn.id === 'btn-isc-' + val);
       });
+      document.querySelectorAll('#rqm-panel-isc .rating-opt-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.id === 'rqm-btn-isc-' + val);
+      });
+      const rqmM = document.getElementById('rqm-isc-manual'); if (rqmM) rqmM.value = val;
       document.getElementById('isc-accordion').classList.remove('open');
       calcAll();
     }
@@ -19852,6 +20311,9 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       document.querySelectorAll('#fr-accordion .rating-opt-btn').forEach(btn => {
         btn.classList.toggle('active', btn.id === 'btn-fr-' + val);
       });
+      document.querySelectorAll('#rqm-panel-fr .rating-opt-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.id === 'rqm-btn-fr-' + val);
+      });
       document.getElementById('fr-accordion').classList.remove('open');
       calcAll();
     }
@@ -19862,6 +20324,9 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       document.getElementById('earth-summary').textContent = (val === 'eff' ? '유효접지(kpp=1.3)' : '비유효접지(kpp=1.5)');
       document.querySelectorAll('#earth-accordion .rating-opt-btn').forEach(btn => {
         btn.classList.toggle('active', btn.id === 'btn-earth-' + val);
+      });
+      document.querySelectorAll('#rqm-panel-earth .rating-opt-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.id === 'rqm-btn-earth-' + val);
       });
       document.getElementById('earth-accordion').classList.remove('open');
       selectSPFType(val === 'eff' ? 'SPF' : 'DEF');
