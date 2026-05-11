@@ -8535,11 +8535,11 @@
             <div class="edu-wrap">
               <div class="edu-section-title">🔍 시험 목적</div>
               <div class="edu-intro" style="line-height:1.6;">
-                <b>LC(무부하 선로), CC(케이블), BC(콘덴서 뱅크)</b> 개폐 시 발생하는 충전전류(지상전류, Capacitive current)를 차단할 때
+                <b>LC(무부하 선로), CC(케이블), BC(콘덴서 뱅크)</b> 개폐 시 발생하는 충전전류(진상전류, Capacitive current)를 차단할 때
                 극간 회복전압 과전압 및 재점호(Restrike)에 의한 이상 과전압을 검증합니다.
                 <br>
                 차단 성능은 재점호 발생 빈도에 따라 <b>Class C1</b>(낮음)과 <b>Class C2</b>(매우 낮음)으로 구분됩니다.
-                60Hz에서의 시험은 50Hz 특성 증명으로 대체 인정됩니다.
+                50Hz에서의 시험은 60Hz 특성 증명으로 대체 인정됩니다.
                 <br><span style="font-size:0.8em; color:var(--mu);">IEC 62271-100 6.111</span>
               </div>
 
@@ -8567,15 +8567,15 @@
 
               <div class="edu-section-title">🔧 Pre conditioning (사전 동작)</div>
               <div class="edu-intro" style="line-height:1.6; margin-bottom:6px;">
-                본 시험 전에 아래 3회의 사전 개방 동작을 수행합니다.
+                본 시험 전에 아래 3회의 사전 차단시험을 수행합니다.(전류만 인가)
               </div>
               <div class="edu-steps">
-                <div class="edu-step"><span class="edu-step-num">1</span><div>OD : <b>Tmin</b> (T60 기준 최소 아크 시간)</div></div>
-                <div class="edu-step"><span class="edu-step-num">2</span><div>OD : <b>Tmed</b> (T60 기준 중간 아크 시간)</div></div>
-                <div class="edu-step"><span class="edu-step-num">3</span><div>OD : <b>Tmax</b> (T60 기준 최대 아크 시간)</div></div>
+                <div class="edu-step"><span class="edu-step-num">1</span><div>Od : <b>Tmin</b> (T60 기준 최소 아크 시간)</div></div>
+                <div class="edu-step"><span class="edu-step-num">2</span><div>Od : <b>Tmed</b> (T60 기준 중간 아크 시간)</div></div>
+                <div class="edu-step"><span class="edu-step-num">3</span><div>Od : <b>Tmax</b> (T60 기준 최대 아크 시간)</div></div>
               </div>
               <div class="edu-tip" style="margin-bottom:12px;">
-                <b>💡 조작 조건:</b> 임의의 제어전압 &amp; 개방 쇄정압 또는 정격 가스압
+                <b>💡 조작 조건:</b> pre-conditioning 임으로, 제어 전압은 임의 선택, 가스압은 주로 duty2 를 먼저 진행함으로 정격으로, 조작 압력은 O-CO 쇄정압을 사용함.
               </div>
 
               <div class="edu-section-title">📋 시험 절차 (단상)</div>
