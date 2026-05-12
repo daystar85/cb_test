@@ -18213,12 +18213,12 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       document.getElementById('rec-row-menu').style.display = 'none';
       if (!recRowTarget) return;
       if (action === 'delete') {
-        if (confirm('이 행을 삭제할까요?')) {
-          recRowTarget.remove();
-          updateRowNumbers(recRowTbl);
-          recSetStatus('행이 삭제되었습니다.', 'ok');
-          recMarkDirty();
-        }
+        const hasData = rowHasData(recRowTarget);
+        if (hasData && !confirm('입력된 데이터가 있습니다. 이 행을 삭제할까요?')) return;
+        recRowTarget.remove();
+        updateRowNumbers(recRowTbl);
+        recSetStatus('행이 삭제되었습니다.', 'ok');
+        recMarkDirty();
       } else if (action === 'add') {
         const newTr = createRecRow(recRowTbl, 0);
         recRowTarget.parentElement.insertBefore(newTr, recRowTarget);
@@ -18422,6 +18422,13 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       tbody.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
+    function rowHasData(tr) {
+      return Array.from(tr.querySelectorAll('input, textarea, select')).some(el => {
+        if (el.tagName === 'SELECT') return el.value !== '' && el.selectedIndex > 0;
+        return el.value.trim() !== '';
+      });
+    }
+
     function delLastRow(tbl) {
       // 수직 모드: vtbl에서 마지막 행 삭제
       if (typeof orientState !== 'undefined' && orientState[tbl] === 'v') {
@@ -18437,6 +18444,8 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       }
       const tbody = document.getElementById('tbody-' + tbl);
       if (!tbody || !tbody.rows.length) return;
+      const lastRow = tbody.rows[tbody.rows.length - 1];
+      if (rowHasData(lastRow) && !confirm('입력된 데이터가 있습니다. 마지막 행을 삭제할까요?')) return;
       tbody.deleteRow(tbody.rows.length - 1);
       recMarkDirty();
     }
