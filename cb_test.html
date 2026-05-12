@@ -12807,7 +12807,7 @@
       <div class="man-section" id="msec-9">
         <div class="man-section-hdr" onclick="toggleSection(9)">
           <div class="man-section-num">10</div>
-          <div class="man-section-title">정격 차단 시간</div>
+          <div class="man-section-title">차단시간</div>
           <div class="man-section-arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="4 6 8 10 12 6" />
@@ -12817,20 +12817,23 @@
           <div class="man-body-inner">
 
             <div class="man-note">
-              <b>정격 차단시간(tb, Rated break-time)</b>은 정격 제어전압·조작압력·가스압력 조건에서 T30, T60, T100s 시의 차단시간으로 결정한다.
-              통상 표기 사이클(2 / 3 / 4 / 5 cycle) 그리드에 맞춰 공표하며, 실제 측정치 중 가장 긴 값을 기준으로 한다.
-              <span class="iec-ref">IEC 62271-100 4.109.1, 6.106</span>
+              <b>차단시간(break time)</b>은 개방동작 시작부터 T30/T60/T100s 조건에서 가장 긴 아킹 타임 사이 구간을 의미한다.
+              정격 제어전압·조작압력·가스압력 조건에서 T30, T60, T100s 시의 최소 차단시간으로 계산하여 결정한다.
+              통상 표기 사이클(2 / 3 / 4 / 5 cycle)로 표시한다.
+              <span class="iec-ref">IEC 62271-306 13.6</span>
             </div>
 
             <div class="man-note">
               <b>① 보정식</b>
               <div class="man-formula">
-                tb = t1 − (t2 − t3)
+                t<sub>bmax</sub> = t<sub>or</sub> + t<sub>am</sub> + t<sub>w</sub> − 18°/360° × T
               </div>
               <ul class="man-list">
-                <li><b>t1</b> : 시험 측정 차단시간</li>
-                <li><b>t2</b> : 시험 조건 (최소 제어전압·조작압력) 에서의 기계적 무부하 개극시간</li>
-                <li><b>t3</b> : 정격 조건 (정격 제어전압·조작압력) 에서의 기계적 무부하 개극시간</li>
+                <li><b>t<sub>bmax</sub></b> : 최대 차단 시간</li>
+                <li><b>t<sub>or</sub></b> : 정격 조건에서 오픈 시간 (정격 전압, 정격 조작압력, 정격 가스압)</li>
+                <li><b>t<sub>am</sub></b> : T30, T60, T100s 중에서 가장 긴 T<sub>min</sub> 값</li>
+                <li><b>t<sub>w</sub></b> : 아킹 윈도우 (162°/360° × T for k<sub>pp</sub> = 1.3, 132°/360° × T for k<sub>pp</sub> = 1.5)</li>
+                <li><b>T</b> : 주기 (20 ms for 50Hz, 16.7 ms for 60Hz)</li>
               </ul>
             </div>
 
