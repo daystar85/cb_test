@@ -5868,7 +5868,7 @@
     <a class="toc-chip" data-idx="6" onclick="manGoto(6)">7. 유닛테스트</a>
     <a class="toc-chip" data-idx="7" onclick="manGoto(7)">8. Subsequent zero</a>
     <a class="toc-chip" data-idx="8" onclick="manGoto(8)">9. X/R ratio</a>
-    <a class="toc-chip" data-idx="9" onclick="manGoto(9)">10. 정격 차단 시간</a>
+    <a class="toc-chip" data-idx="9" onclick="manGoto(9)">10. 차단시간</a>
     <a class="toc-chip" data-idx="10" onclick="manGoto(10)">11. 임계전류시험</a>
     <a class="toc-chip" data-idx="11" onclick="manGoto(11)">12. 기타</a>
   </div>
@@ -13478,21 +13478,15 @@
 
       // 3. kpp-pill update removed as requested
 
-      if (activeKey === 'T100a') {
-        calcT100a(Ur, Isc, fr, kpp);
-      } else if (activeKey === 'L90' || activeKey === 'L75') {
-        calcSLF(Ur, Isc, fr, kpp);
-      } else if (activeKey === 'OP2') {
-        calcOP2(Ur, Isc, fr);
-      } else if (activeKey === 'SPF') {
-        calcSPF(Ur, Isc, fr);
-      } else if (activeKey === 'LCCB') {
-        calcLCCB(Ur, Isc, fr);
-      } else if (activeKey === 'SR') {
-        calcSR(Ur, Isc, fr);
-      } else if (activeKey === 'T10' || activeKey === 'T30' || activeKey === 'T60') {
-        calcBTF(Ur, Isc, fr, kpp);
-      } else if (activeKey === 'T100s') {
+      // 항상 모든 탭 계산 (오차경고 기준값 최신 유지)
+      if (typeof calcBTF === 'function') try { calcBTF(Ur, Isc, fr, kpp); } catch(e) {}
+      if (typeof calcT100a === 'function') try { calcT100a(Ur, Isc, fr, kpp); } catch(e) {}
+      if (typeof calcSLF === 'function') try { calcSLF(Ur, Isc, fr, kpp); } catch(e) {}
+      if (typeof calcOP2 === 'function') try { calcOP2(Ur, Isc, fr); } catch(e) {}
+      if (typeof calcSPF === 'function') try { calcSPF(Ur, Isc, fr); } catch(e) {}
+      if (typeof calcLCCB === 'function') try { calcLCCB(Ur, Isc, fr); } catch(e) {}
+      if (typeof calcSR === 'function') try { calcSR(Ur, Isc, fr); } catch(e) {}
+      if (activeKey === 'T100s') {
         window._poles = getPoles(Ur, Isc, fr, kpp);
         window._ctx = { Ur, Isc, fr, kpp };
         renderPole();
