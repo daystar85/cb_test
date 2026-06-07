@@ -129,6 +129,13 @@
         - Duty 1: 최대 제어전압 & O 쇄정 유압 & 최소 가스압
         - LC2/CC2 Duty 2: C 동작 무부하 가능 / 최대 제어전압 & 정격 유압 & 정격 가스압
         - BC2 Duty 2: 40회 C 무부하 / 80C 분리 진행 가능 / 최대 제어전압 & 정격 유압 & 정격 가스압
+ v1.35  LCCB 시험 목적 설명 텍스트 수정
+        - "3상시험도 가능하나..." 문구 삭제
+        - 50Hz/60Hz 관계: pre-conditioning 가혹성 기준 설명으로 교체
+ v1.36  BC2 노트 텍스트 수정
+        - "BC2의 80C(전압 피크 투입)는..." → "80C(전압 피크 투입)는..."
+ v1.37  LCCB 가이드: "📋 시험 절차 (단상)" 타이틀과 Pre-conditioning 카드 사이 빈 줄 제거
+ v1.38  Pre-conditioning 설명 문장 앞 빈 줄 제거 (white-space:pre-line 으로 인한 렌더링 문제)
 ═══════════════════════════════════════════════════════════════
 -->
   <style>
@@ -8558,10 +8565,9 @@
               <div class="edu-section-title">🔍 시험 목적</div>
               <div class="edu-intro" style="line-height:1.6;">
                 <b>LC(무부하 선로), CC(케이블), BC(콘덴서 뱅크)</b> 개폐 시 발생하는 충전전류(진상전류, Capacitive current)를 차단할 때
-                극간 회복전압 과전압 및 재점호(Restrike)에 의한 이상 과전압을 검증합니다.
-                차단 성능은 재점호 발생 빈도에 따라 <b>Class C1</b>(낮음)과 <b>Class C2</b>(매우 낮음)으로 구분됩니다.
-                50Hz에서의 시험은 60Hz 특성 증명으로 대체 인정됩니다.
-                3상시험도 가능하나, 주로 단상시험으로 진행합니다.
+                극간 회복전압 과전압 및 재점호(Restrike)에 의한 이상 과전압을 검증합니다.<br>
+                차단 성능은 재점호 발생 빈도에 따라 <b>Class C1</b>(낮음)과 <b>Class C2</b>(매우 낮음)으로 구분됩니다.<br>
+                60Hz 시험이 50Hz 보다 전압 상승률이 높아 커버 가능하나, pre-conditioning은 50Hz 가 더 가혹하기에 50Hz 기준으로 pre-conditioning 실시하여야 50 및 60Hz 동시 만족 가능합니다.
                 <br><span style="font-size:0.8em; color:var(--mu);">IEC 62271-100 6.111</span>
               </div>
 
@@ -8588,13 +8594,10 @@
 
 
               <div class="edu-section-title">📋 시험 절차 (단상)</div>
-
               <div style="margin-bottom:10px; border:1px solid var(--bd); border-radius:10px; overflow:hidden;">
                 <div style="padding:8px 12px; background:var(--sf2); font-size:0.8rem; font-weight:700; color:var(--mu);">🔧 Pre-conditioning — 사전 동작 (3회 O)</div>
                 <div style="padding:10px 12px;">
-                  <div class="edu-intro" style="line-height:1.6; margin-bottom:6px; font-size:0.86rem;">
-                    본 시험 전에 아래 3회의 사전 차단시험을 수행합니다. (전류만 인가)
-                  </div>
+                  <div class="edu-intro" style="line-height:1.6; margin-bottom:6px; font-size:0.86rem;">본 시험 전에 아래 3회의 사전 차단시험을 수행합니다. (전류만 인가)</div>
                   <div class="edu-steps" style="margin:0;">
                     <div class="edu-step"><span class="edu-step-num">1</span><div>Od : <b>T<sub>min</sub></b> (T60 기준 최소 아크 시간)</div></div>
                     <div class="edu-step"><span class="edu-step-num">2</span><div>Od : <b>T<sub>med</sub></b> (T60 기준 중간 아크 시간)</div></div>
@@ -8653,7 +8656,7 @@
                   </div>
                   <div style="font-size:0.786rem; color:var(--mu); margin-top:6px; display:flex; flex-direction:column; gap:3px;">
                     <div>* 40회 C 동작은 무부하 조작 가능</div>
-                    <div>* BC2의 80C(전압 피크 투입)는 120CO와 분리 진행 가능 (총 200회)</div>
+                    <div>* 80C(전압 피크 투입)는 120CO와 분리 진행 가능 (총 200회)</div>
                     <div>* 조작 조건: 최대 제어전압 &amp; 정격 유압 &amp; 정격 가스압</div>
                   </div>
                 </div>
