@@ -136,6 +136,9 @@
         - "BC2의 80C(전압 피크 투입)는..." → "80C(전압 피크 투입)는..."
  v1.37  LCCB 가이드: "📋 시험 절차 (단상)" 타이틀과 Pre-conditioning 카드 사이 빈 줄 제거
  v1.38  Pre-conditioning 설명 문장 앞 빈 줄 제거 (white-space:pre-line 으로 인한 렌더링 문제)
+ v1.39  LCCB 가이드: 회복전압 감소 금지 앞에 시험순서 경고 문구 추가
+ v1.40  LCCB 가이드: 🛠️ 피시품 준비 섹션 추가 (시험방식/인가방향/가스압/조작전압/조작압력)
+ v1.41  LCCB 시험순서 문구 수정: "진행시" → "진행 시", "새가스" → "새 가스", "condition 이" → "condition이"
 ═══════════════════════════════════════════════════════════════
 -->
   <style>
@@ -8593,6 +8596,17 @@
 
 
 
+              <div class="edu-section-title">🛠️ 피시품 준비</div>
+              <div class="edu-card" style="margin-bottom:14px;">
+                <div class="prep-grid">
+                  <div class="prep-row"><span class="prep-label">📍 시험 방식:</span><span class="prep-value">단상시험</span></div>
+                  <div class="prep-row"><span class="prep-label">🔌 인가 방향:</span><span class="prep-value">duty 1 과 duty 2 반대</span></div>
+                  <div class="prep-row"><span class="prep-label">🎈 가스압:</span><span class="prep-value">duty 1 — 최소, duty 2 — 정격</span></div>
+                  <div class="prep-row"><span class="prep-label">⚡ 조작전압:</span><span class="prep-value">최대</span></div>
+                  <div class="prep-row"><span class="prep-label">⚙️ 조작압력:</span><span class="prep-value">duty 1 — O 쇄정 압력, duty 2 — 정격 압력</span></div>
+                </div>
+              </div>
+
               <div class="edu-section-title">📋 시험 절차 (단상)</div>
               <div style="margin-bottom:10px; border:1px solid var(--bd); border-radius:10px; overflow:hidden;">
                 <div style="padding:8px 12px; background:var(--sf2); font-size:0.8rem; font-weight:700; color:var(--mu);">🔧 Pre-conditioning — 사전 동작 (3회 O)</div>
@@ -8674,6 +8688,9 @@
                 </div>
               </div>
 
+              <div class="edu-warn" style="display:block; margin-top:4px;">
+                <b>⚠ 시험순서 :</b> Pre-conditioning → duty 2 → 인가방향 전환 &amp; 가스압 변경 → duty 1, duty 1 먼저 진행 시 duty 2 조건을 위해 새 가스를 넣으면 new condition이 됨으로 duty 2 먼저 진행
+              </div>
               <div class="edu-warn" style="display:block; margin-top:4px;">
                 <b>⚠ 회복전압 감소 금지 (6.111.8):</b> 차단 후 300ms 이내에 극간 전압이 10% 이상 감소하면 안 됩니다.
               </div>
