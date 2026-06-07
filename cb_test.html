@@ -139,6 +139,12 @@
  v1.39  LCCB 가이드: 회복전압 감소 금지 앞에 시험순서 경고 문구 추가
  v1.40  LCCB 가이드: 🛠️ 피시품 준비 섹션 추가 (시험방식/인가방향/가스압/조작전압/조작압력)
  v1.41  LCCB 시험순서 문구 수정: "진행시" → "진행 시", "새가스" → "새 가스", "condition 이" → "condition이"
+ v1.42  매뉴얼 7번 유닛테스트: 소전류 시험 시 half pole 방식(1.5pu 인가 / 반대쪽 접지) 항목 추가
+ v1.43  매뉴얼 7번 유닛테스트: half pole 항목 위치를 마지막 → 마지막 바로 위로 이동
+ v1.44  매뉴얼 7번 유닛테스트: 중앙부 전압(Vo) 분담률 계산기 추가
+        - V1, V2, V외함, Cg, Cs 입력 → Vo 자동 계산
+        - 동축케이블 방식 Cs 계산 (εr, l, a, b) 및 자동 적용
+        - 수식 설명 토글 포함
 ═══════════════════════════════════════════════════════════════
 -->
   <style>
@@ -12077,48 +12083,6 @@
               </div>
               <div class="rec-guide-item">
                 <div class="rec-guide-ico">💾</div>
-                <div class="rec-guide-text"><b>자동 저장</b><span>입력 즉시 브라우저에 자동 저장. JSON / Excel 내보내기도 지원</span></div>
-              </div>
-            </div>
-          </details>
-
-          <!-- ── 오차 경고 내역 패널 (STC) ── -->
-          <div id="val-warn-panel-stc" style="display:none; margin:10px 0 0 0; padding:10px 14px; border-radius:8px; border:1px solid rgba(239,68,68,0.35); background:rgba(239,68,68,0.07); font-size:0.786rem; line-height:1.6;">
-            <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
-              <span style="color:rgba(239,68,68,0.9); font-weight:700; font-size:0.857rem;">⚠ 오차 경고 내역</span>
-              <span id="val-warn-count-stc" style="background:rgba(239,68,68,0.18); color:rgba(239,68,68,0.9); border-radius:10px; padding:1px 8px; font-size:0.75rem; font-weight:700;"></span>
-              <button onclick="document.getElementById('val-warn-panel-stc').style.display='none'" style="margin-left:auto; background:none; border:none; cursor:pointer; color:var(--mu); font-size:1rem; line-height:1; padding:0 2px;">✕</button>
-            </div>
-            <div id="val-warn-list-stc" style="display:flex; flex-direction:column; gap:3px;"></div>
-          </div>
-
-        </div>
-
-      </div><!-- /card -->
-
-      <!-- 리포트 통합 관리 -->
-      <div class="card" id="rec-report-mgmt" style="margin-top:20px;">
-        <div class="chdr" onclick="toggleSettingsSection('rec-report')"
-          style="cursor:pointer; user-select:none; display:flex; align-items:center; justify-content:space-between;">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <div class="dot" id="rec-report-dot" style="background:var(--acc)"></div>
-            리포트 출력 <span id="rec-report-active-label" style="font-size:0.857rem; color:var(--mu); margin-left:4px; text-transform:none;">(대상:
-              무부하)</span>
-          </div>
-          <span id="arrow-rec-report"
-            style="font-size:0.857rem; color:var(--mu); transition: 1.0s; flex-shrink:0; transform:rotate(0deg);">▾</span>
-        </div>
-        <div id="section-rec-report" style="padding:0; overflow:hidden; transition: 1.0s ease; max-height:0px;">
-          <div class="rec-btn-row" style="padding:16px; gap:12px; justify-content: center;">
-            <button class="rec-btn rec-btn-report" id="btn-report-excel" onclick="exportExcelReport(activeRecTab)"
-              style="border-color:var(--acc); color:var(--acc); flex:1; font-weight:600; max-width:200px;">
-              📊 Excel 리포트
-            </button>
-            <button class="rec-btn rec-btn-report" id="btn-report-pdf" onclick="exportPDFReport(activeRecTab)"
-              style="border-color:var(--acc); color:var(--acc); flex:1; font-weight:600; max-width:200px;">
-              📄 PDF 리포트
-            </button>
-          </div>
         </div>
       </div>
     </div><!-- /page-record -->
@@ -12727,9 +12691,130 @@
                 <span class="iec-ref">단락전류 60% 초과 시험 (T100, SLF 등): 2 unit에 전류를 인가해야 함 (전압은 하나의 unit에 인가 가능)</span>
               </li>
               <li>전압은 분담률에 따라 인가</li>
+              <li style="list-style:none; padding:0; margin:6px 0 10px 0;">
+                <!-- ── 분담률 계산기 ── -->
+                <div style="background:var(--sf2); border:1px solid var(--bd); border-radius:10px; padding:14px 16px; font-size:0.82rem;">
+                  <div style="font-weight:700; color:var(--acc); margin-bottom:10px;">⚡ 분담률 계산기</div>
+
+
+                  <!-- 회로도 SVG -->
+                  <div style="margin-bottom:14px; overflow-x:auto;">
+                    <svg viewBox="0 0 520 175" width="100%" style="max-width:520px; display:block; margin:0 auto; font-family:sans-serif; font-size:11px;" xmlns="http://www.w3.org/2000/svg">
+                      <line x1="30" y1="60" x2="80" y2="60" stroke="#888" stroke-width="2"/>
+                      <circle cx="30" cy="60" r="6" fill="#5b9cf6"/>
+                      <text x="5" y="55" fill="#5b9cf6" font-weight="bold" font-size="13">V1</text>
+                      <line x1="80" y1="60" x2="114" y2="60" stroke="#888" stroke-width="2"/>
+                      <rect x="114" y="47" width="5" height="26" fill="#9ca3af" rx="1"/>
+                      <rect x="123" y="47" width="5" height="26" fill="#9ca3af" rx="1"/>
+                      <line x1="128" y1="60" x2="162" y2="60" stroke="#888" stroke-width="2"/>
+                      <text x="119" y="42" fill="#9ca3af" font-size="11" text-anchor="middle">Cg1</text>
+                      <line x1="162" y1="60" x2="358" y2="60" stroke="#888" stroke-width="2"/>
+                      <circle cx="260" cy="60" r="7" fill="#f59e0b"/>
+                      <text x="244" y="48" fill="#f59e0b" font-weight="bold" font-size="13">Vo</text>
+                      <line x1="358" y1="60" x2="392" y2="60" stroke="#888" stroke-width="2"/>
+                      <rect x="392" y="47" width="5" height="26" fill="#9ca3af" rx="1"/>
+                      <rect x="401" y="47" width="5" height="26" fill="#9ca3af" rx="1"/>
+                      <line x1="406" y1="60" x2="440" y2="60" stroke="#888" stroke-width="2"/>
+                      <text x="399" y="42" fill="#9ca3af" font-size="11" text-anchor="middle">Cg2</text>
+                      <line x1="440" y1="60" x2="490" y2="60" stroke="#888" stroke-width="2"/>
+                      <circle cx="490" cy="60" r="6" fill="#34d399"/>
+                      <text x="496" y="55" fill="#34d399" font-weight="bold" font-size="13">V2</text>
+                      <line x1="260" y1="67" x2="260" y2="98" stroke="#888" stroke-width="2"/>
+                      <rect x="246" y="98" width="28" height="5" fill="#9ca3af" rx="1"/>
+                      <rect x="246" y="107" width="28" height="5" fill="#9ca3af" rx="1"/>
+                      <line x1="260" y1="112" x2="260" y2="138" stroke="#888" stroke-width="2"/>
+                      <text x="292" y="108" fill="#9ca3af" font-size="11">Cs</text>
+                      <line x1="200" y1="138" x2="320" y2="138" stroke="#e879f9" stroke-width="2"/>
+                      <line x1="215" y1="145" x2="305" y2="145" stroke="#e879f9" stroke-width="1.5"/>
+                      <line x1="230" y1="152" x2="290" y2="152" stroke="#e879f9" stroke-width="1"/>
+                      <text x="260" y="168" fill="#e879f9" font-size="10" text-anchor="middle">Housing (V_enclosure)</text>
+                      <rect x="30" y="72" width="228" height="14" fill="#5b9cf6" fill-opacity="0.10" rx="3" stroke="#5b9cf6" stroke-width="0.7" stroke-dasharray="4,3"/>
+                      <text x="144" y="82" fill="#5b9cf6" font-size="9" text-anchor="middle">Unit 1 (V1-Vo)</text>
+                      <rect x="262" y="72" width="228" height="14" fill="#34d399" fill-opacity="0.10" rx="3" stroke="#34d399" stroke-width="0.7" stroke-dasharray="4,3"/>
+                      <text x="376" y="82" fill="#34d399" font-size="9" text-anchor="middle">Unit 2 (Vo-V2)</text>
+                    </svg>
+                  </div>
+
+                  <!-- 입력 그리드 -->
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+                    <div>
+                      <div style="color:var(--mu); font-size:0.75rem; margin-bottom:3px;">V<sub>1</sub> — 전원측 전압 (kV)</div>
+                      <input id="ut-v1" type="number" placeholder="예) 100" style="width:100%; background:var(--sf); border:1px solid var(--bd); border-radius:6px; padding:5px 8px; color:var(--tx); font-family:var(--mono); font-size:0.86rem; box-sizing:border-box;" oninput="utCalcVo()">
+                    </div>
+                    <div>
+                      <div style="color:var(--mu); font-size:0.75rem; margin-bottom:3px;">V<sub>2</sub> — 부하측 전압 (kV)</div>
+                      <input id="ut-v2" type="number" placeholder="예) 0" style="width:100%; background:var(--sf); border:1px solid var(--bd); border-radius:6px; padding:5px 8px; color:var(--tx); font-family:var(--mono); font-size:0.86rem; box-sizing:border-box;" oninput="utCalcVo()">
+                    </div>
+                    <div style="grid-column:1/-1;">
+                      <div style="color:var(--mu); font-size:0.75rem; margin-bottom:3px;">V<sub>외함</sub> — 외함 전압 (kV)</div>
+                      <input id="ut-vt" type="number" placeholder="예) 0" style="width:100%; background:var(--sf); border:1px solid var(--bd); border-radius:6px; padding:5px 8px; color:var(--tx); font-family:var(--mono); font-size:0.86rem; box-sizing:border-box;" oninput="utCalcVo()">
+                    </div>
+                    <div>
+                      <div style="color:var(--mu); font-size:0.75rem; margin-bottom:3px;">C<sub>g1</sub> — V<sub>1</sub>측 Grading Cap. (pF)</div>
+                      <input id="ut-cg1" type="number" placeholder="예) 800" style="width:100%; background:var(--sf); border:1px solid var(--bd); border-radius:6px; padding:5px 8px; color:var(--tx); font-family:var(--mono); font-size:0.86rem; box-sizing:border-box;" oninput="utCalcVo()">
+                    </div>
+                    <div>
+                      <div style="color:var(--mu); font-size:0.75rem; margin-bottom:3px;">C<sub>g2</sub> — V<sub>2</sub>측 Grading Cap. (pF)</div>
+                      <input id="ut-cg2" type="number" placeholder="예) 800" style="width:100%; background:var(--sf); border:1px solid var(--bd); border-radius:6px; padding:5px 8px; color:var(--tx); font-family:var(--mono); font-size:0.86rem; box-sizing:border-box;" oninput="utCalcVo()">
+                    </div>
+                    <div style="grid-column:1/-1;">
+                      <div style="color:var(--mu); font-size:0.75rem; margin-bottom:3px;">C<sub>s</sub> — 중앙부 도체↔외함 Stray Cap. (pF) <span style="color:var(--acc); cursor:pointer; font-size:0.72rem;" onclick="utToggleCoax()">[동축케이블 계산 ▾]</span></div>
+                      <input id="ut-cs" type="number" placeholder="예) 50" style="width:100%; background:var(--sf); border:1px solid var(--bd); border-radius:6px; padding:5px 8px; color:var(--tx); font-family:var(--mono); font-size:0.86rem; box-sizing:border-box;" oninput="utCalcVo()">
+                    </div>
+                  </div>
+
+                  <!-- 동축케이블 Cs 계산 영역 -->
+                  <div id="ut-coax-wrap" style="display:none; background:var(--sf); border:1px solid var(--bd); border-radius:8px; padding:10px 12px; margin-bottom:10px;">
+                    <div style="font-weight:600; color:var(--mu); font-size:0.78rem; margin-bottom:8px;">🔌 동축케이블 방식으로 C<sub>s</sub> 계산</div>
+                    <div style="font-size:0.75rem; color:var(--mu); margin-bottom:8px; line-height:1.6;">
+                      <b style="color:var(--tx);">ε<sub>r</sub></b> : 절연체 비유전율 (진공=1, SF₆≈1, 에폭시≈4~5)<br>
+                      <b style="color:var(--tx);">l</b> : 도체 길이 (mm)<br>
+                      <b style="color:var(--tx);">a</b> : 내부 도체 반경 (mm)<br>
+                      <b style="color:var(--tx);">b</b> : 외함 내벽 반경 (mm)<br>
+                      <span style="font-size:0.72rem;">수식: C = 2πε₀ε<sub>r</sub>l / ln(b/a)</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+                      <div>
+                        <div style="color:var(--mu); font-size:0.72rem; margin-bottom:3px;">ε<sub>r</sub> (비유전율)</div>
+                        <input id="ut-er" type="number" placeholder="예) 1.0" step="0.1" style="width:100%; background:var(--sf2); border:1px solid var(--bd); border-radius:6px; padding:5px 8px; color:var(--tx); font-family:var(--mono); font-size:0.86rem; box-sizing:border-box;" oninput="utCalcCoax()">
+                      </div>
+                      <div>
+                        <div style="color:var(--mu); font-size:0.72rem; margin-bottom:3px;">l — 길이 (mm)</div>
+                        <input id="ut-l" type="number" placeholder="예) 500" style="width:100%; background:var(--sf2); border:1px solid var(--bd); border-radius:6px; padding:5px 8px; color:var(--tx); font-family:var(--mono); font-size:0.86rem; box-sizing:border-box;" oninput="utCalcCoax()">
+                      </div>
+                      <div>
+                        <div style="color:var(--mu); font-size:0.72rem; margin-bottom:3px;">a — 내부 도체 반경 (mm)</div>
+                        <input id="ut-a" type="number" placeholder="예) 30" style="width:100%; background:var(--sf2); border:1px solid var(--bd); border-radius:6px; padding:5px 8px; color:var(--tx); font-family:var(--mono); font-size:0.86rem; box-sizing:border-box;" oninput="utCalcCoax()">
+                      </div>
+                      <div>
+                        <div style="color:var(--mu); font-size:0.72rem; margin-bottom:3px;">b — 외함 내벽 반경 (mm)</div>
+                        <input id="ut-b" type="number" placeholder="예) 150" style="width:100%; background:var(--sf2); border:1px solid var(--bd); border-radius:6px; padding:5px 8px; color:var(--tx); font-family:var(--mono); font-size:0.86rem; box-sizing:border-box;" oninput="utCalcCoax()">
+                      </div>
+                    </div>
+                    <div id="ut-coax-result" style="font-family:var(--mono); font-size:0.82rem; color:var(--mu); min-height:20px;"></div>
+                    <button onclick="utApplyCoax()" style="margin-top:8px; background:var(--acc); color:#fff; border:none; border-radius:6px; padding:5px 14px; font-size:0.8rem; cursor:pointer;">C<sub>s</sub>에 적용</button>
+                  </div>
+
+                  <!-- 결과 -->
+                  <div style="background:var(--sf); border:1px solid var(--bd); border-radius:8px; padding:10px 14px;">
+                    <div style="font-size:0.75rem; color:var(--mu); margin-bottom:6px;">계산 결과</div>
+                    <div style="font-family:var(--mono); font-size:0.86rem; color:var(--tx); line-height:2;" id="ut-vo-result">
+                      — 값을 입력하면 자동 계산됩니다
+                    </div>
+                  </div>
+
+                  <!-- 수식 설명 토글 -->                  <div style="margin-top:8px; font-size:0.75rem; color:var(--mu); cursor:pointer;" onclick="utToggleFormula()">&#x1F4D0; 수식 보기 &#x25BE;</div>
+                  <div id="ut-formula-wrap" style="display:none; margin-top:6px; background:var(--sf); border:1px solid var(--bd); border-radius:8px; padding:10px 14px; font-family:var(--mono); font-size:0.78rem; line-height:1.9; color:var(--mu);">
+                    V<sub>o</sub> = (C<sub>g1</sub>&middot;V<sub>1</sub> + C<sub>g2</sub>&middot;V<sub>2</sub> + C<sub>s</sub>&middot;V<sub>외함</sub>) / (C<sub>g1</sub> + C<sub>g2</sub> + C<sub>s</sub>)<br>
+                    <span style="font-size:0.72rem;">※ 중앙부 도체는 V1측 Cg1, V2측 Cg2, 외함측 Cs 3개 커패시터에 의해 용량 분압됩니다.</span>
+                  </div>
+                </div>
+              </li>
               <li>극간별 투입 개리차는 1/6 cycle 이내, 개극 개리차는 1/8 cycle 이내</li>
-              <li>유닛 테스트로 진행할 경우, 전구간 절연 확인 시험 진행 필요
+              <li>유닛 테스트로 단락시험 진행할 경우, 전구간 절연 확인 시험 진행 필요
                 <span class="iec-ref">T100s(b), T100a Max. arcing time에서 차단시험 한 번씩 실시</span>
+              </li>
+              <li>유닛테스트로 소전류 시험(LC/CC/BC 등)을 진행할 시 <b>half pole</b>을 실시하며, 이때 half pole의 한쪽에 <b>1.5 pu</b>를 인가하고 반대쪽은 접지
               </li>
               <li>자세한 시험 절차는 아래 항목 참고
                 <span class="iec-ref">IEC 62271-100 7.102.4.2 — Unit testing</span>
@@ -22632,6 +22717,69 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       })();
 
     })();
+
+    /* ── 유닛테스트 분담률 계산기 ── */
+    window.utCalcVo = function () {
+      var v1  = parseFloat(document.getElementById('ut-v1').value);
+      var v2  = parseFloat(document.getElementById('ut-v2').value);
+      var vt  = parseFloat(document.getElementById('ut-vt').value);
+      var cg1 = parseFloat(document.getElementById('ut-cg1').value);
+      var cg2 = parseFloat(document.getElementById('ut-cg2').value);
+      var cs  = parseFloat(document.getElementById('ut-cs').value);
+      var el  = document.getElementById('ut-vo-result');
+      if ([v1, v2, vt, cg1, cg2, cs].some(isNaN)) {
+        el.innerHTML = '\u2014 \uac12\uc744 \uc785\ub825\ud558\uba74 \uc790\ub3d9 \uacc4\uc0b0\ub429\ub2c8\ub2e4';
+        return;
+      }
+      var denom = cg1 + cg2 + cs;
+      if (denom === 0) { el.innerHTML = '<span style="color:var(--t30);">\u26a0 Cg1 + Cg2 + Cs = 0, \ubd84\ubaa8 \uc624\ub958</span>'; return; }
+      var vo = (cg1 * v1 + cg2 * v2 + cs * vt) / denom;
+      var dv1 = v1 - vo;
+      var dv2 = v2 - vo;
+      var totalAbs = Math.abs(dv1) + Math.abs(dv2);
+      var pct1 = totalAbs > 0 ? Math.abs(dv1) / totalAbs * 100 : 50;
+      var pct2 = totalAbs > 0 ? Math.abs(dv2) / totalAbs * 100 : 50;
+      el.innerHTML =
+        'V<sub>o</sub> (\uc911\uc559\ubd80 \uc804\uc704) = <b style="color:var(--acc); font-size:1.05em;">' + vo.toFixed(2) + ' kV</b><br>' +
+        '<span style="color:var(--mu); font-size:0.85em;">\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span><br>' +
+        'V<sub>1</sub> &minus; V<sub>o</sub> = <b>' + dv1.toFixed(2) + ' kV</b>' +
+        '&nbsp;&nbsp;&rarr; Unit 1 \ubd84\ub2f4\ub960 = <b style="color:#5b9cf6;">' + pct1.toFixed(1) + ' %</b><br>' +
+        'V<sub>2</sub> &minus; V<sub>o</sub> = <b>' + dv2.toFixed(2) + ' kV</b>' +
+        '&nbsp;&nbsp;&rarr; Unit 2 \ubd84\ub2f4\ub960 = <b style="color:#34d399;">' + pct2.toFixed(1) + ' %</b>';
+    };
+        window.utCalcCoax = function () {
+      var er = parseFloat(document.getElementById('ut-er').value);
+      var l  = parseFloat(document.getElementById('ut-l').value);
+      var a  = parseFloat(document.getElementById('ut-a').value);
+      var b  = parseFloat(document.getElementById('ut-b').value);
+      var el = document.getElementById('ut-coax-result');
+      if ([er, l, a, b].some(isNaN) || a <= 0 || b <= a) {
+        el.textContent = b <= a && !isNaN(a) && !isNaN(b) ? '⚠ b > a 조건 필요' : '';
+        return;
+      }
+      var eps0 = 8.854187817e-12;
+      var cs_f = 2 * Math.PI * eps0 * er * (l * 1e-3) / Math.log(b / a);
+      var cs_pf = cs_f * 1e12;
+      el.innerHTML = 'C<sub>s</sub> = <b style="color:var(--acc);">' + cs_pf.toFixed(2) + ' pF</b>';
+      el._val = cs_pf;
+    };
+
+    window.utApplyCoax = function () {
+      var el = document.getElementById('ut-coax-result');
+      if (!el._val) return;
+      document.getElementById('ut-cs').value = el._val.toFixed(2);
+      utCalcVo();
+    };
+
+    window.utToggleCoax = function () {
+      var w = document.getElementById('ut-coax-wrap');
+      w.style.display = w.style.display === 'none' ? 'block' : 'none';
+    };
+
+    window.utToggleFormula = function () {
+      var w = document.getElementById('ut-formula-wrap');
+      w.style.display = w.style.display === 'none' ? 'block' : 'none';
+    };
   </script>
 </body>
 
