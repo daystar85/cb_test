@@ -107,6 +107,13 @@
  3) 기록지 수정     → recCollectData/recLoadData/recBuildWorkbook
  4) 매뉴얼 수정     → page-manual (L10655~)
  5) VC 시험방식     → calcAll 내 Ur 분기 (L11882~)
+
+[변경 이력]
+ v1.25  기존 버전
+ v1.26  debouncedSave: debounce(500ms) → throttle+trailing(1초)
+        저장 간격 최소 1초 보장, 1초 내 변경사항은 trailing으로 반영
+ v1.27  recMarkDirty, recLoadData 내 recAutoSaveLocal() 직접 호출
+        → debouncedSave()로 교체 (throttle 실제 적용)
 ═══════════════════════════════════════════════════════════════
 -->
   <style>
@@ -17831,7 +17838,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
 
     function recMarkDirty() {
       recDirty = true;
-      recAutoSaveLocal();
+      debouncedSave();
       updateRecTabBadges();
       if (typeof applyValidationHighlight === 'function') applyValidationHighlight();
     }
@@ -18021,11 +18028,24 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       }
     }
 
-    // ── 지연 저장 함수 (디바운싱): 빈번한 입력 시 성능 최적화 ──
+    // ── 지연 저장 함수 (스로틀+trailing): 1초 간격 저장 보장 ──
     let saveTimeout = null;
+    let lastSaveTime = 0;
     function debouncedSave() {
+      const now = Date.now();
+      const remaining = 1000 - (now - lastSaveTime);
       if (saveTimeout) clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(() => { recAutoSaveLocal(); }, 500);
+      if (remaining <= 0) {
+        // 마지막 저장으로부터 1초 이상 지났으면 즉시 저장
+        lastSaveTime = now;
+        recAutoSaveLocal();
+      } else {
+        // 1초가 안 됐으면 남은 시간 후에 저장 (trailing)
+        saveTimeout = setTimeout(() => {
+          lastSaveTime = Date.now();
+          recAutoSaveLocal();
+        }, remaining);
+      }
     }
 
     function recAutoSaveLocal() {
@@ -18195,7 +18215,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
           }
         });
       }
-      if (typeof recAutoSaveLocal === 'function') recAutoSaveLocal();
+      if (typeof debouncedSave === 'function') debouncedSave();
       // 로드 완료 후 오차 경고 갱신
       setTimeout(() => { if (typeof applyValidationHighlight === 'function') applyValidationHighlight(); }, 100);
     }
