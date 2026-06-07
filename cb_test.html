@@ -114,6 +114,21 @@
         저장 간격 최소 1초 보장, 1초 내 변경사항은 trailing으로 반영
  v1.27  recMarkDirty, recLoadData 내 recAutoSaveLocal() 직접 호출
         → debouncedSave()로 교체 (throttle 실제 적용)
+ v1.28  LC/CC/BC 시험절차(단상) Duty 1 횟수 표기 오류 수정: 24회 → 48회
+ v1.29  LC/CC/BC Duty 1 조작 조건 텍스트 → 💡 노트 2개로 교체
+        (pre-conditioning 조작 조건 설명 / 아킹타임 합산 유효 조건 추가)
+ v1.30  LC/CC/BC 시험절차 구조 재편:
+        - Pre-conditioning을 별도 섹션에서 📋 시험 절차(단상) 안 첫 카드로 이동
+        - 💡 노트 2개를 Pre-conditioning 카드 하단으로 이동
+        - Tmin/Tmed/Tmax 아래첨자 적용
+ v1.31  Pre-conditioning 조작 조건: "O-CO 쇄정압" → "O-CO 쇄정압 또는 정격"
+ v1.32  아킹타임 합산 노트에 추가 시험 조건 문구 추가
+        (3회 미달 시 추가 시험 가능, Tmin 이상으로 실시)
+ v1.33  Duty 1 헤더 표기 수정: "48회 O" → "48O"
+ v1.34  각 Duty 카드 조작 조건 주석 수정
+        - Duty 1: 최대 제어전압 & O 쇄정 유압 & 최소 가스압
+        - LC2/CC2 Duty 2: C 동작 무부하 가능 / 최대 제어전압 & 정격 유압 & 정격 가스압
+        - BC2 Duty 2: 40회 C 무부하 / 80C 분리 진행 가능 / 최대 제어전압 & 정격 유압 & 정격 가스압
 ═══════════════════════════════════════════════════════════════
 -->
   <style>
@@ -8572,23 +8587,28 @@
 
 
 
-              <div class="edu-section-title">🔧 Pre conditioning (사전 동작)</div>
-              <div class="edu-intro" style="line-height:1.6; margin-bottom:6px;">
-                본 시험 전에 아래 3회의 사전 차단시험을 수행합니다.(전류만 인가)
-              </div>
-              <div class="edu-steps">
-                <div class="edu-step"><span class="edu-step-num">1</span><div>Od : <b>Tmin</b> (T60 기준 최소 아크 시간)</div></div>
-                <div class="edu-step"><span class="edu-step-num">2</span><div>Od : <b>Tmed</b> (T60 기준 중간 아크 시간)</div></div>
-                <div class="edu-step"><span class="edu-step-num">3</span><div>Od : <b>Tmax</b> (T60 기준 최대 아크 시간)</div></div>
-              </div>
-              <div class="edu-tip" style="margin-bottom:12px;">
-                <b>💡 조작 조건:</b> pre-conditioning 임으로, 제어 전압은 임의 선택, 가스압은 주로 duty2 를 먼저 진행함으로 정격으로, 조작 압력은 O-CO 쇄정압을 사용함.
-              </div>
-
               <div class="edu-section-title">📋 시험 절차 (단상)</div>
 
               <div style="margin-bottom:10px; border:1px solid var(--bd); border-radius:10px; overflow:hidden;">
-                <div style="padding:8px 12px; background:var(--sf2); font-size:0.8rem; font-weight:700; color:var(--mu);">LC1 / CC1 / BC1 — Duty 1 (24회 O)</div>
+                <div style="padding:8px 12px; background:var(--sf2); font-size:0.8rem; font-weight:700; color:var(--mu);">🔧 Pre-conditioning — 사전 동작 (3회 O)</div>
+                <div style="padding:10px 12px;">
+                  <div class="edu-intro" style="line-height:1.6; margin-bottom:6px; font-size:0.86rem;">
+                    본 시험 전에 아래 3회의 사전 차단시험을 수행합니다. (전류만 인가)
+                  </div>
+                  <div class="edu-steps" style="margin:0;">
+                    <div class="edu-step"><span class="edu-step-num">1</span><div>Od : <b>T<sub>min</sub></b> (T60 기준 최소 아크 시간)</div></div>
+                    <div class="edu-step"><span class="edu-step-num">2</span><div>Od : <b>T<sub>med</sub></b> (T60 기준 중간 아크 시간)</div></div>
+                    <div class="edu-step"><span class="edu-step-num">3</span><div>Od : <b>T<sub>max</sub></b> (T60 기준 최대 아크 시간)</div></div>
+                  </div>
+                  <div style="font-size:0.786rem; color:var(--mu); margin-top:8px; display:flex; flex-direction:column; gap:4px;">
+                    <div>💡 조작 조건: pre-conditioning 임으로, 제어 전압은 임의 선택, 가스압은 주로 duty 2를 먼저 진행함으로 정격으로, 조작 압력은 O-CO 쇄정압 또는 정격을 사용함.</div>
+                    <div>💡 아킹타임 합산 : T60 시험 결과의 T<sub>min</sub> + T<sub>med</sub> + T<sub>max</sub> − 2ms 이상이면 유효, 만일 3번의 시험으로 아킹타임을 못맞출 경우 추가 시험은 가능하나 T<sub>min</sub> 이상으로 시험 실시</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-bottom:10px; border:1px solid var(--bd); border-radius:10px; overflow:hidden;">
+                <div style="padding:8px 12px; background:var(--sf2); font-size:0.8rem; font-weight:700; color:var(--mu);">LC1 / CC1 / BC1 — Duty 1 (48O)</div>
                 <div style="padding:10px 12px;">
                   <div class="edu-steps" style="margin:0;">
                     <div class="edu-step"><span class="edu-step-num">1</span><div>12 × O &nbsp;<span style="color:var(--mu); font-size:0.85em;">(15° step, 한쪽 극성)</span></div></div>
@@ -8597,7 +8617,9 @@
                     <div class="edu-step"><span class="edu-step-num">4</span><div>6 × O &nbsp;<span style="color:var(--mu); font-size:0.85em;">(최소 아크 시간, 반대 극성)</span></div></div>
                     <div class="edu-step"><span class="edu-step-num">+</span><div>@ × O &nbsp;<span style="color:var(--mu); font-size:0.85em;">(48회 달성을 위한 보충, 15° step)</span></div></div>
                   </div>
-                  <div style="font-size:0.786rem; color:var(--mu); margin-top:6px;">조작 조건: 최대 제어전압 &amp; 개방 쇄정압</div>
+                  <div style="font-size:0.786rem; color:var(--mu); margin-top:6px; display:flex; flex-direction:column; gap:3px;">
+                    <div>* 조작 조건: 최대 제어전압 &amp; O 쇄정 유압 &amp; 최소 가스압</div>
+                  </div>
                 </div>
               </div>
 
@@ -8611,7 +8633,10 @@
                     <div class="edu-step"><span class="edu-step-num">4</span><div>3 × O &amp; 3 × CO &nbsp;<span style="color:var(--mu); font-size:0.85em;">(최소 아크 시간, 반대 극성)</span></div></div>
                     <div class="edu-step"><span class="edu-step-num">+</span><div>@ × O &amp; @ × CO &nbsp;<span style="color:var(--mu); font-size:0.85em;">(24O/24CO 달성을 위한 보충, 15° step)</span></div></div>
                   </div>
-                  <div style="font-size:0.786rem; color:var(--mu); margin-top:6px;">* C 동작은 무부하 조작 가능 &nbsp;|&nbsp; 조작 조건: 최대 제어전압 &amp; 정격 가스압</div>
+                  <div style="font-size:0.786rem; color:var(--mu); margin-top:6px; display:flex; flex-direction:column; gap:3px;">
+                    <div>* C 동작은 무부하 조작 가능</div>
+                    <div>* 조작 조건: 최대 제어전압 &amp; 정격 유압 &amp; 정격 가스압</div>
+                  </div>
                 </div>
               </div>
 
@@ -8626,7 +8651,11 @@
                     <div class="edu-step"><span class="edu-step-num">+</span><div>@ × CO &nbsp;<span style="color:var(--mu); font-size:0.85em;">(120CO 달성을 위한 보충, 15° step)</span></div></div>
                     <div class="edu-step"><span class="edu-step-num">★</span><div>80 × C &nbsp;<span style="color:var(--mu); font-size:0.85em;">(전압 피크 ±25° 이내 투입)</span></div></div>
                   </div>
-                  <div style="font-size:0.786rem; color:var(--mu); margin-top:6px;">* 40회 C 동작은 무부하 조작 가능 &nbsp;|&nbsp; BC2의 80C는 120CO와 분리 진행 가능 (총 200회) &nbsp;|&nbsp; 조작 조건: 최대 제어전압 &amp; 정격 가스압</div>
+                  <div style="font-size:0.786rem; color:var(--mu); margin-top:6px; display:flex; flex-direction:column; gap:3px;">
+                    <div>* 40회 C 동작은 무부하 조작 가능</div>
+                    <div>* BC2의 80C(전압 피크 투입)는 120CO와 분리 진행 가능 (총 200회)</div>
+                    <div>* 조작 조건: 최대 제어전압 &amp; 정격 유압 &amp; 정격 가스압</div>
+                  </div>
                 </div>
               </div>
 
