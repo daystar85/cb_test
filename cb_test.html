@@ -8032,7 +8032,7 @@
               <div class="rlabel">Ibr — 차단전류</div>
               <div class="rval" id="op2-ibr" style="color:var(--op2)">—</div>
               <div class="runit">kA</div>
-              <div class="rtol">(0 ~ +10%)</div>
+              <div class="rtol" id="op2-tol-ibr">—</div>
             </div>
             <div class="rcell">
               <div class="rlabel">Uc — TRV 피크전압</div>
@@ -8060,9 +8060,9 @@
             </div>
             <div class="rcell">
               <div class="rlabel">td — 지연시간</div>
-              <div class="rval" style="color:var(--op2)">2</div>
+              <div class="rval" id="op2-td" style="color:var(--op2)">—</div>
               <div class="runit">μs</div>
-              <div class="rtol">(±20%)</div>
+              <div class="rtol" id="op2-tol-td">—</div>
             </div>
             <div class="rcell">
               <div class="rlabel">RRRV — 전압상승률</div>
@@ -8074,19 +8074,19 @@
               <div class="rlabel">di/dt — 전류변화율</div>
               <div class="rval" id="op2-didt" style="color:var(--op2)">—</div>
               <div class="runit">A/μs</div>
-              <div class="rtol">(0 ~ +10%)</div>
+              <div class="rtol" id="op2-tol-didt">—</div>
             </div>
             <div class="rcell">
               <div class="rlabel">Imk — 투입전류 (rms)</div>
               <div class="rval" id="op2-imk" style="color:var(--op2)">—</div>
               <div class="runit">kA</div>
-              <div class="rtol">(0 ~ +10%)</div>
+              <div class="rtol" id="op2-tol-imk">—</div>
             </div>
             <div class="rcell">
               <div class="rlabel">Uin — 투입전압</div>
               <div class="rval" id="op2-uin" style="color:var(--op2)">—</div>
               <div class="runit">kV</div>
-              <div class="rtol">(96.6% 이상)</div>
+              <div class="rtol" id="op2-tol-uin">—</div>
             </div>
           </div>
           <div class="sep"></div>
@@ -11403,6 +11403,8 @@
                   <th>Hyd.P.<br>(MPa)</th>
                   <th>Tarc<br>(ms)</th>
                   <th>Ibr<br>(A)</th>
+                  <th>u1<br>(kV)</th>
+                  <th>u2<br>(kV)</th>
                   <th>Uc<br>(kV)</th>
                   <th>Count<br>Total</th>
                   <th>Count<br>Min</th>
@@ -11438,6 +11440,8 @@
                   <th>Hyd.P.<br>(MPa)</th>
                   <th>Tarc<br>(ms)</th>
                   <th>Ibr<br>(A)</th>
+                  <th>u1<br>(kV)</th>
+                  <th>u2<br>(kV)</th>
                   <th>TRV<br>(kV)</th>
                   <th>Count<br>Total</th>
                   <th>Count<br>Min</th>
@@ -12994,7 +12998,9 @@
       const cleanT = (testType || 'T10').toUpperCase();
 
       if (field === 'ibr') {
-        if (cleanT === 'T100S' || cleanT === 'T100a') {
+        if (cleanT === 'OP2') {
+          min = target; max = target * 1.10; tolStr = '0 ~ +10%';
+        } else if (cleanT === 'T100S' || cleanT === 'T100a') {
           min = target; max = target * 1.05; tolStr = '0 ~ +5%';
         } else if (cleanT === 'T10' || cleanT === 'T30') {
           min = target * 0.8; max = target * 1.2; tolStr = '±20%';
@@ -13026,7 +13032,9 @@
           min = target; max = target * 1.15; tolStr = '0 ~ +15%';
         }
       } else if (field === 'didt') {
-        if (cleanT === 'T100S' || cleanT === 'T100A') {
+        if (cleanT === 'OP2') {
+          min = target; max = target * 1.10; tolStr = '0 ~ +10%';
+        } else if (cleanT === 'T100S' || cleanT === 'T100A') {
           min = target; max = target * 1.05; tolStr = '0 ~ +5%';
         } else if (cleanT === 'L90') {
           min = target; max = target * 0.92 / 0.90; tolStr = '90~92% of STC\'s';
@@ -13037,7 +13045,9 @@
         }
         else { min = target * 0.8; max = target * 1.2; tolStr = '±20%'; }
       } else if (field === 'td') {
-        if (cleanT === 'T60') {
+        if (cleanT === 'OP2') {
+          min = 2; max = target; tolStr = '2μs ~ t1×0.1';
+        } else if (cleanT === 'T60') {
           min = 2; max = target;
           tolStr = '2μs ~ 0.3t1';
         } else {
@@ -13061,6 +13071,8 @@
         min = target; max = target * 1.10; tolStr = '0 ~ +10%';
       } else if (field === 'vc-t3') {
         min = target * 0.9; max = target * 3.0; tolStr = '−10% ~ +200%';
+      } else if (field === 'imk') {
+        min = target; max = target * 1.10; tolStr = '0 ~ +10%';
       } else if (field === 'uma') {
         min = target * 0.966; max = '—'; tolStr = '96.6% 이상';
       } else if (field === 'ima-peak') {
@@ -15443,20 +15455,23 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       const r1 = v => Math.round(v * 10) / 10;
       const kpp_op2 = activeOP2Earth === 'eff' ? 2.0 : 2.5;
       const arcAngle = activeOP2Earth === 'eff' ? 162 : 132;
+      // 접지: ×1.3, 비접지: ×1.5
+      const ucFactor = activeOP2Earth === 'eff' ? 1.3 : 1.5;
 
       // Ibr = Isc × 25%
       const ibr = r1(Isc * 0.25);
       // Uc  = kpp × Ur × 1.25 × √(2/3)
       const uc = r1(kpp_op2 * Ur * 1.25 * S23);
-      // u1  = kpp × Ur × 0.75 × √(2/3)
-      const u1 = r1(kpp_op2 * Ur * 0.75 * S23);
-      // t1  = ROUND(u1 / 2, 0.1) × 2
-      const t1 = r1(u1 / 2) * 2;
+      // u1(kV) = Ur × kpp × 0.75 × √(2/3)  [kpp=2.0(접지)/2.5(비접지)]
+      const u1 = r1(Ur * kpp_op2 * 0.75 * S23);
+      // t1(μs) = Ur × 1.3(접지)/1.5(비접지) × 0.75 × √(2/3)
+      const t1 = r1(Ur * ucFactor * 0.75 * S23);
       // t2  = t1 × 2 ~ t1 × 4
       const t2min = r1(t1 * 2);
       const t2max = r1(t1 * 4);
-      // rrrv = uc / t1 (approx 2 kV/μs for high-voltage class)
-      const rrrv = r1(uc / t1);
+      // rrrv = u1 / t1  [kV/μs]
+      const r2 = v => Math.round(v * 100) / 100;
+      const rrrv = t1 > 0 ? r2(u1 / t1) : 0;
       // di/dt
       const didt = r1(ibr * S8 * Math.PI * fr / 1000);
       // arc window (tarc_max − tarc_min)
@@ -15475,12 +15490,20 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       sv('op2-t2', t2min + ' ~ ' + t2max);
       sv('op2-u1', u1);
       sv('op2-t1', t1);
+      // td: 2 ~ t1×0.1
+      const tdMax = r1(t1 * 0.1);
+      sv('op2-td', '2 ~ ' + tdMax);
       sv('op2-rrrv', rrrv);
       sv('op2-didt', didt);
       sv('op2-imk', imk);
       sv('op2-uin', uin);
-      renderTolUI('op2-tol-uc', uc, uc, 'uc', 'OP2', Ur, 'kV');
-      renderTolUI('op2-tol-rrrv', rrrv, rrrv, 'rrrv', 'OP2', Ur, 'kV/μs');
+      renderTolUI('op2-tol-ibr',  ibr,   ibr,   'ibr',  'OP2', Ur, 'kA');
+      renderTolUI('op2-tol-uc',   uc,    uc,    'uc',   'OP2', Ur, 'kV');
+      renderTolUI('op2-tol-td',   tdMax, tdMax, 'td',   'OP2', Ur, 'μs');
+      renderTolUI('op2-tol-rrrv', rrrv,  rrrv,  'rrrv', 'OP2', Ur, 'kV/μs', 2);
+      renderTolUI('op2-tol-didt', didt,  didt,  'didt', 'OP2', Ur, 'A/μs');
+      renderTolUI('op2-tol-imk',  imk,   imk,   'imk',  'OP2', Ur, 'kA');
+      renderTolUI('op2-tol-uin',  uin,   uin,   'uma',  'OP2', Ur, 'kV');
 
       const arcEl = document.getElementById('op2-arc');
       if (arcEl) { arcEl.textContent = arcWindow + ' ms'; }
@@ -15509,12 +15532,12 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       const fEl = document.getElementById('op2-formulas');
       if (fEl) fEl.innerHTML = [
         ['Ibr', 'Isc × 25%'],
-        ['Uc', 'kpp × Ur × 1.25 × √(2/3)   [kpp=' + kpp_op2 + ']'],
-        ['u1', 'kpp × Ur × 0.75 × √(2/3)'],
-        ['t1', 'ROUND(u1/2, 0.1) × 2  [μs]'],
+        ['Uc', 'kpp × Ur × 1.25 × √(2/3)   [kpp=' + kpp_op2 + ', factor=' + ucFactor + ']'],
+        ['u1', 'Ur × kpp × 0.75 × √(2/3)  [kV, kpp=' + kpp_op2 + ']'],
+        ['t1', 'Ur × 1.3(접지)/1.5(비접지) × 0.75 × √(2/3)  [μs]'],
         ['t2', 't1×2 ~ t1×4  [μs]'],
-        ['td', '2 μs  (±20%)'],
-        ['RRRV', '≈ uc / t1  [kV/μs]'],
+        ['td', '2 μs ~ t1×0.1  [μs]'],
+        ['RRRV', 'u1 / t1  [kV/μs]'],
         ['di/dt', 'Ibr × √8 × π × fr / 1000'],
         ['Arcing window', arcAngle + '°/360° × 1000/fr'],
         ['Uin', '2 × Ur × √2/√3  (양 전원 최대 위상차 180°)'],
@@ -17145,8 +17168,8 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       op2: COLS_OP2_BREAK,
       spf: COLS_OP2_BREAK,
       'lccb-pre': ['Osc. No.', 'Duty', 'V.con\n(V)', 'Hyd\n(MPa)', 'Tarc\n(ms)', 'Ibr\n(kArms)', 'Time\n(hh:mm)', 'Remarks'],
-      'lccb-d1': ['Osc. No.', 'Duty', 'V.con\n(V)', 'Hyd\n(MPa)', 'Tarc\n(ms)', 'Tbr\n(ms)', 'I.BR\n(A)', 'Uc\n(kV)', 'Count Total', 'Count Min', 'Time\n(hh:mm)', 'Remarks'],
-      'lccb-d2': ['Osc. No.', 'Duty', 'V.con\n(V)', 'Hyd\n(MPa)', 'Tarc\n(ms)', 'Tbr\n(ms)', 'I.BR\n(A)', 'Uc\n(kV)', 'Count Total', 'Count Min', 'Time\n(hh:mm)', 'Remarks'],
+      'lccb-d1': ['Osc. No.', 'Duty', 'V.con\n(V)', 'Hyd\n(MPa)', 'Tarc\n(ms)', 'Tbr\n(ms)', 'I.BR\n(A)', 'u1\n(kV)', 'u2\n(kV)', 'Uc\n(kV)', 'Count Total', 'Count Min', 'Time\n(hh:mm)', 'Remarks'],
+      'lccb-d2': ['Osc. No.', 'Duty', 'V.con\n(V)', 'Hyd\n(MPa)', 'Tarc\n(ms)', 'Tbr\n(ms)', 'I.BR\n(A)', 'u1\n(kV)', 'u2\n(kV)', 'Uc\n(kV)', 'Count Total', 'Count Min', 'Time\n(hh:mm)', 'Remarks'],
       'sr-d1': COLS_SR,
       'sr-d2': COLS_SR,
       'sr-d3': COLS_SR,
@@ -17285,6 +17308,23 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
             cols.splice(tbrIdx, 1);
             cols.splice(tarcIdx + 1, 0, 'Tbr\n(ms)');
             changed = true;
+          }
+        }
+      });
+
+      // lccb-d1/d2: u1, u2 컬럼 삽입 (Uc/TRV 앞, 없는 경우에만)
+      ['lccb-d1', 'lccb-d2'].forEach(tblKey => {
+        if (Array.isArray(colsObj[tblKey])) {
+          const cols = colsObj[tblKey];
+          // u1이 이미 있으면 스킵
+          if (!cols.includes('u1\n(kV)')) {
+            // Uc\n(kV) 또는 TRV\n(kV) 위치 앞에 삽입
+            const insertBefore = cols.indexOf('Uc\n(kV)') > -1 ? 'Uc\n(kV)' : 'TRV\n(kV)';
+            const idx = cols.indexOf(insertBefore);
+            if (idx > -1) {
+              cols.splice(idx, 0, 'u1\n(kV)', 'u2\n(kV)');
+              changed = true;
+            }
           }
         }
       });
@@ -17533,7 +17573,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       const tab = activeRecTab;
       let warnDir = null; // 'low' | 'high'
 
-      const IBR_MAP  = { t10: 'b-ibr',  t30: 'b-ibr',  t60: 'b-ibr',  t100s: 's-ibr', t100a: 'a-ibr', l90: 'slf-ibr', l75: 'slf-ibr' };
+      const IBR_MAP  = { t10: 'b-ibr',  t30: 'b-ibr',  t60: 'b-ibr',  t100s: 's-ibr', t100a: 'a-ibr', l90: 'slf-ibr', l75: 'slf-ibr', op2: 'op2-ibr' };
       const TRV_MAP  = { t10: 'b-uc',   t30: 'b-uc',   t60: 'b-uc',   t100s: 's-uc',  t100a: 'a-uc',  l90: 'slf-um',  l75: 'slf-um',  vc: 'v-uc', op2: 'op2-uc' };
       const DIDT_MAP = { t10: 'b-didt', t30: 'b-didt', t60: 'b-didt', t100s: 's-didt', t100a: 'a-didt', l90: 'slf-didt-src', l75: 'slf-didt-src', op2: 'op2-didt', spf: 'spf-didt' };
       const ITH_MAP  = {}; // Ith는 고정 규정값(200~500μs)으로 검증, DOM 참조 불필요
@@ -17548,13 +17588,19 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         const cLow = colText.toLowerCase();
 
         if (cLow.includes('ibr') && opts.ibr) {
-          // Ibr: -10% ~ +25%
           const tId = IBR_MAP[tab];
           if (tId) {
             const tVal = parseFloat(document.getElementById(tId)?.textContent || '0');
             if (tVal > 0) {
-              if (val < tVal * 0.90)      warnDir = 'low';
-              else if (val > tVal * 1.25) warnDir = 'high';
+              if (tab === 'op2') {
+                // OP2: 0 ~ +10%
+                if (val < tVal)             warnDir = 'low';
+                else if (val > tVal * 1.10) warnDir = 'high';
+              } else {
+                // 기타: -10% ~ +25%
+                if (val < tVal * 0.90)      warnDir = 'low';
+                else if (val > tVal * 1.25) warnDir = 'high';
+              }
             }
           }
         }
@@ -17583,8 +17629,15 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
               tVal = parseFloat(document.getElementById(tId)?.textContent || '');
             }
             if (tVal > 0) {
-              const loFactor = (tab === 'l90' || tab === 'l75') ? 1.0 : 0.95;
-              const hiFactor = (tab === 'l90' || tab === 'l75') ? (_Ur > 72.5 ? 1.05 : 1.10) : 1.20;
+              let loFactor, hiFactor;
+              if (tab === 'l90' || tab === 'l75') {
+                loFactor = 1.0; hiFactor = _Ur > 72.5 ? 1.05 : 1.10;
+              } else if (tab === 'op2') {
+                // OP2 Uc: 0 ~ +5%
+                loFactor = 1.0; hiFactor = 1.05;
+              } else {
+                loFactor = 0.95; hiFactor = 1.20;
+              }
               if (val < tVal * loFactor)      warnDir = 'low';
               else if (val > tVal * hiFactor) warnDir = 'high';
             }
@@ -17612,6 +17665,10 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
                 // 0 ~ +5%
                 if (val < tVal)             warnDir = 'low';
                 else if (val > tVal * 1.05) warnDir = 'high';
+              } else if (tab === 'op2') {
+                // OP2: 0 ~ +10%
+                if (val < tVal)             warnDir = 'low';
+                else if (val > tVal * 1.10) warnDir = 'high';
               } else {
                 if (val < tVal * 0.85)      warnDir = 'low';
                 else if (val > tVal * 1.15) warnDir = 'high';
@@ -18000,7 +18057,8 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
     const REC_SHEET_NAMES = {
       noload: '무부하', t10: 'T10', t30: 'T30', t60: 'T60',
       't100s-make': 'T100s_투입', t100s: 'T100s_차단', t100a: 'T100a',
-      l90: 'L90', vc: '절연확인', l75: 'L75', op2: 'OP2', spf: 'SPF', lccb: 'LC_CC_BC', sr: 'SR',
+      l90: 'L90', vc: '절연확인', l75: 'L75', op2: 'OP2', spf: 'SPF',
+      'lccb-pre': 'LC_CC_BC_Pre', 'lccb-d1': 'LC_CC_BC_D1', 'lccb-d2': 'LC_CC_BC_D2', sr: 'SR',
       'stc-main': 'STC_주회로', 'stc-test': 'STC_시험'
     };
 
@@ -18612,7 +18670,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       let csv = '# CB \ucc28\ub2e8\uc2dc\ud5d8 \uae30\ub85d\uc9c0\n';
       csv += '\uacfc\uc81c\uba85,' + (i.project || '') + '\n\uc2dc\ud5d8\uc790,' + (i.tester || '') + '\n\uc2dc\ud5d8\uc77c\uc790,' + (i.date || '') + '\n\n';
       REC_TABLES.forEach(tbl => {
-        const _tl = {'noload':'NoLoad','t10':'T10','t30':'T30','t60':'T60','t100s':'T100s','t100s-make':'T100s-Make','t100a':'T100a','l90':'L90','vc':'VC','l75':'L75','op2-noload':'OP2-NoLoad','op2-make':'OP2-Make','op2':'OP2','spf':'SPF','lccb':'LCCB','sr':'SR','stc-main':'STC-Main','stc-test':'STC-Test'};
+        const _tl = {'noload':'NoLoad','t10':'T10','t30':'T30','t60':'T60','t100s':'T100s','t100s-make':'T100s-Make','t100a':'T100a','l90':'L90','vc':'VC','l75':'L75','op2-noload':'OP2-NoLoad','op2-make':'OP2-Make','op2':'OP2','spf':'SPF','lccb-pre':'LC_CC_BC_Pre','lccb-d1':'LC_CC_BC_D1','lccb-d2':'LC_CC_BC_D2','sr':'SR','stc-main':'STC-Main','stc-test':'STC-Test'};
         csv += '## ' + (_tl[tbl] || tbl) + '\n';
         csv += 'No.,' + REC_COLS[tbl].join(',') + '\n';
         (data.tables[tbl] || []).forEach((v, idx) => { csv += (idx + 1) + ',' + v.join(',') + '\n'; });
@@ -19815,7 +19873,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
 
       // 탭 한글 이름 매핑
       const TAB_LABEL = { t10:'T10', t30:'T30', t60:'T60', t100s:'T100s', t100a:'T100a', l90:'L90', l75:'L75', op2:'OP2', spf:'SPF', noload:'무부하', vc:'VC', lccb:'LCCB', sr:'SR', 'stc-main':'STC 주회로', 'stc-test':'STC 시험' };
-      const ratio = { t10:0.10, t30:0.30, t60:0.60, t100s:1.0, t100a:1.0, l90:0.90, l75:0.75, 'stc-main': 1.0, 'stc-test': 1.0 };
+      const ratio = { t10:0.10, t30:0.30, t60:0.60, t100s:1.0, t100a:1.0, l90:0.90, l75:0.75, op2:0.25, 'stc-main': 1.0, 'stc-test': 1.0 };
       const S23 = Math.sqrt(2 / 3);
       const warnItems = []; // { tab, rowNo, colName, val, dir }
 
@@ -19852,6 +19910,12 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         else if (tab==='t30')  ucNom = Ur*kpp*1.54*S23;
         else if (tab==='t60')  ucNom = Ur*kpp*1.5*S23;
         else if (tab==='t100s'||tab==='t100a') ucNom = Ur*kpp*1.4*S23;
+        else if (tab==='op2') {
+          // OP2 Uc = kpp_op2 × Ur × 1.25 × √(2/3)
+          const kpp_op2 = (document.getElementById('op2-status-eff')?.classList.contains('active') ||
+            document.getElementById('inp-earth')?.value === 'eff') ? 2.0 : 2.5;
+          ucNom = kpp_op2 * Ur * 1.25 * S23;
+        }
         else if (tab==='l90'||tab==='l75') {
           if (Ur && Isc) {
             const _Z = 450, _kaf = 1.4, _tdL = Ur >= 245 ? 0.5 : 0.2, _pct = tab === 'l90' ? 90 : 75;
@@ -19859,7 +19923,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
           }
         }
         const ucMin = ucNom ? ucNom : null;  // Uc: 0% ~ +5% (Ur>72.5) or +10%
-        const ucMax = ucNom ? ucNom*(Ur>72.5?1.05:1.10) : null;
+        const ucMax = ucNom ? (tab==='op2' ? ucNom*1.05 : ucNom*(Ur>72.5?1.05:1.10)) : null;
 
         if (chk('ibr'))  markCell('Ibr',   checkDir(getCellVal('Ibr'),  ibrMin, ibrMax), rowNo, tab, ibrMin, ibrMax);
         if (chk('trv') && ucNom) {
@@ -19890,7 +19954,8 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
             else if (tab==='t60')          { didtMin=ref*0.90; didtMax=ref*1.10; }  // ±10%
             else if (tab==='l90')          { didtMin=ref*(0.90/0.90); didtMax=ref*(0.92/0.90); }  // 90~92% of STC
             else if (tab==='l75')          { didtMin=ref*(0.71/0.75); didtMax=ref*(0.79/0.75); }  // 71~79%
-            else                           { didtMin=ref*0.80; didtMax=ref*1.20; }  // ±20% (T10/T30/OP2/SPF)
+            else if (tab==='op2')          { didtMin=ref;      didtMax=ref*1.10; }  // OP2: 0~+10%
+            else                           { didtMin=ref*0.80; didtMax=ref*1.20; }  // ±20% (T10/T30/SPF)
             markCell('di/dt', checkDir(getCellVal('di/dt'), didtMin, didtMax), rowNo, tab, didtMin, didtMax);
           }
         }
@@ -19951,6 +20016,35 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
           }
         }
         // STC 시험 결과 → checkRow에서 제외, 별도 독립 블록에서 처리
+      }
+
+      // ── OP2 투입시험(op2-make) 검증 ──
+      {
+        const tab = 'op2-make';
+        const tbl  = document.getElementById('tbl-op2-make');
+        const tbody = document.getElementById('tbody-op2-make');
+        if (tbl && tbody && Ur && Isc) {
+          const colMap = {};
+          tbl.querySelectorAll('thead th').forEach((th, i) => { colMap[th.textContent.trim()] = i; });
+          const findIdx = (name) => { const n = norm(name); for (const k of Object.keys(colMap)) { if (norm(k).includes(n)) return colMap[k]; } return -1; };
+          // 기준값
+          const kpp_op2m = (document.getElementById('inp-earth')?.value === 'eff') ? 2.0 : 2.5;
+          const uinRef  = parseFloat(document.getElementById('op2-uin')?.textContent  || '0');
+          const imkRef  = parseFloat(document.getElementById('op2-imk')?.textContent  || '0');
+          Array.from(tbody.querySelectorAll('tr')).forEach((tr, ri) => {
+            const tds = tr.querySelectorAll('td');
+            const getV = (name) => { const ci = findIdx(name); if (ci<0||ci>=tds.length) return NaN; const inp=tds[ci].querySelector('input,textarea'); return inp?parseFloat(inp.value):NaN; };
+            const mark = (name, dir, minV, maxV) => { if (!dir) return; const ci=findIdx(name); if (ci>=0&&ci<tds.length) markWarn(tds[ci], dir, name, ri+1, 'op2', minV, maxV); };
+            // Uma ≥ 96.6%
+            if (uinRef > 0) {
+              const v = getV('Uma'); mark('Uma', checkDir(v, uinRef*0.966, null), uinRef*0.966, null);
+            }
+            // Ima(kArms): 0~+10%
+            if (imkRef > 0) {
+              const v = getV('Ima'); mark('Ima', checkDir(v, imkRef, imkRef*1.10), imkRef, imkRef*1.10);
+            }
+          });
+        }
       }
 
       // ── 가로 모드 테이블 순회 ──
@@ -20042,6 +20136,17 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         const uc1Ref = parseFloat(document.getElementById('lc-uc1')?.textContent);
         const uc2Ref = parseFloat(document.getElementById('lc-uc2')?.textContent);
 
+        // LCCB Uc 검증 헬퍼: 음수 극성은 절대값으로 비교하되 방향 반전
+        // +극성: v < min → low(덜가혹), v > max → high(과혹)
+        // -극성: |v| < min → low(덜가혹), |v| > max → high(과혹)  (부호 무관, 절대값 기준)
+        function checkDirUcLCCB(v, min, max) {
+          if (isNaN(v)) return null;
+          const av = Math.abs(v);
+          if (av < min - 0.005) return 'low';
+          if (av > max + 0.005) return 'high';
+          return null;
+        }
+
         // duty1 테이블
         if (!isNaN(uc1Ref) && uc1Ref > 0) {
           const uc1Min = uc1Ref, uc1Max = uc1Ref * 1.03;
@@ -20057,7 +20162,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
               if (ci < 0 || ci >= tds.length) return;
               const inp = tds[ci].querySelector('input,textarea');
               const v = inp ? parseFloat(inp.value) : NaN;
-              const dir = checkDir(v, uc1Min, uc1Max);
+              const dir = checkDirUcLCCB(v, uc1Min, uc1Max);
               if (dir) markWarn(tds[ci], dir, 'Uc', ri + 1, 'lccb', uc1Min, uc1Max);
             });
           }
@@ -20078,7 +20183,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
               if (ci < 0 || ci >= tds.length) return;
               const inp = tds[ci].querySelector('input,textarea');
               const v = inp ? parseFloat(inp.value) : NaN;
-              const dir = checkDir(v, uc2Min, uc2Max);
+              const dir = checkDirUcLCCB(v, uc2Min, uc2Max);
               if (dir) markWarn(tds[ci], dir, 'Uc', ri + 1, 'lccb', uc2Min, uc2Max);
             });
           }
