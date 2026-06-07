@@ -12766,6 +12766,60 @@
                   <!-- 동축케이블 Cs 계산 영역 -->
                   <div id="ut-coax-wrap" style="display:none; background:var(--sf); border:1px solid var(--bd); border-radius:8px; padding:10px 12px; margin-bottom:10px;">
                     <div style="font-weight:600; color:var(--mu); font-size:0.78rem; margin-bottom:8px;">🔌 동축케이블 방식으로 C<sub>s</sub> 계산</div>
+                    <!-- 동축케이블 3D 다이어그램 -->
+                    <div style="margin-bottom:10px; overflow-x:auto;">
+                      <svg viewBox="0 0 420 190" width="100%" style="max-width:420px; display:block; margin:0 auto; font-family:sans-serif;" xmlns="http://www.w3.org/2000/svg">
+
+                        <!-- ── 외부 실린더 측면 ── -->
+                        <rect x="65" y="45" width="265" height="100" fill="#e879f9" fill-opacity="0.03"/>
+                        <line x1="65" y1="45" x2="330" y2="45" stroke="#e879f9" stroke-width="1.8"/>
+                        <line x1="65" y1="145" x2="330" y2="145" stroke="#e879f9" stroke-width="1.8"/>
+
+                        <!-- 왼쪽 뒷면 호 (숨겨진 부분, 점선) -->
+                        <path d="M65,45 A20,50 0 0 1 65,145" fill="none" stroke="#e879f9" stroke-width="1.4" stroke-dasharray="4,3" opacity="0.4"/>
+                        <!-- 왼쪽 앞면 호 (실선) -->
+                        <path d="M65,45 A20,50 0 0 0 65,145" fill="none" stroke="#e879f9" stroke-width="1.9"/>
+
+                        <!-- ── 내부 도체 측면 ── -->
+                        <rect x="65" y="70" width="265" height="50" fill="#f59e0b" fill-opacity="0.08"/>
+                        <line x1="65" y1="70" x2="330" y2="70" stroke="#f59e0b" stroke-width="1.4"/>
+                        <line x1="65" y1="120" x2="330" y2="120" stroke="#f59e0b" stroke-width="1.4"/>
+
+                        <!-- 왼쪽 뒷면 호 (점선) -->
+                        <path d="M65,70 A11,25 0 0 1 65,120" fill="none" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,2" opacity="0.4"/>
+                        <!-- 왼쪽 앞면 호 (실선) -->
+                        <path d="M65,70 A11,25 0 0 0 65,120" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+
+                        <!-- ── 오른쪽 절단면 ── -->
+                        <!-- 절연체 링 -->
+                        <ellipse cx="330" cy="95" rx="20" ry="50" fill="#a855f7" fill-opacity="0.07" stroke="#e879f9" stroke-width="2.2"/>
+                        <!-- 내부 도체 -->
+                        <ellipse cx="330" cy="95" rx="11" ry="25" fill="#f59e0b" fill-opacity="0.15" stroke="#f59e0b" stroke-width="1.8"/>
+
+                        <!-- ── 치수 라벨 ── -->
+                        <!-- b: 중심 → 외부 상단 -->
+                        <line x1="330" y1="95" x2="330" y2="48" stroke="#e879f9" stroke-width="1.5" stroke-dasharray="3,2"/>
+                        <polygon points="330,44 326,52 334,52" fill="#e879f9"/>
+                        <text x="338" y="67" fill="#e879f9" font-size="15" font-weight="bold">b</text>
+
+                        <!-- a: 중심 → 내부 하단 -->
+                        <line x1="330" y1="95" x2="330" y2="117" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
+                        <polygon points="330,120 326,112 334,112" fill="#f59e0b"/>
+                        <text x="338" y="114" fill="#f59e0b" font-size="15" font-weight="bold">a</text>
+
+                        <!-- εr: 절연체 영역 중심 -->
+                        <text x="197" y="62" fill="#a855f7" font-size="16" font-weight="bold" text-anchor="middle">ε<tspan baseline-shift="sub" font-size="12">r</tspan></text>
+
+                        <!-- l: 길이 치수선 -->
+                        <line x1="65" y1="162" x2="330" y2="162" stroke="#6ee7b7" stroke-width="1.5"/>
+                        <line x1="65"  y1="156" x2="65"  y2="168" stroke="#6ee7b7" stroke-width="1.5"/>
+                        <line x1="330" y1="156" x2="330" y2="168" stroke="#6ee7b7" stroke-width="1.5"/>
+                        <polygon points="69,162 79,158 79,166" fill="#6ee7b7"/>
+                        <polygon points="326,162 316,158 316,166" fill="#6ee7b7"/>
+                        <text x="197" y="179" fill="#6ee7b7" font-size="13" text-anchor="middle" font-weight="bold">l</text>
+
+                      </svg>
+                    </div>
                     <div style="font-size:0.75rem; color:var(--mu); margin-bottom:8px; line-height:1.6;">
                       <b style="color:var(--tx);">ε<sub>r</sub></b> : 절연체 비유전율 (진공=1, SF₆≈1, 에폭시≈4~5)<br>
                       <b style="color:var(--tx);">l</b> : 도체 길이 (mm)<br>
