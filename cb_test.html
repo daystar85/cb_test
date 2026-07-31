@@ -9133,6 +9133,7 @@
             <button class="rec-btn save-btn" style="border-color:var(--acc);color:var(--acc);" onclick="recSaveAs()">📝
               새
               이름으로 저장</button>
+            <button class="rec-btn danger" style="border-color:var(--acc);color:var(--acc);" onclick="recClearCurrentTab()">♻ 현재 파트만 초기화</button>
             <button class="rec-btn danger" onclick="recClearAll()">🗑 전체 초기화</button>
           </div>
           <div class="file-path-bar" id="rec-file-path-bar">
@@ -17826,7 +17827,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
             }
           }
         }
-        else if (cLow.includes('i.dur') && opts.dur) {
+        else if ((cLow.includes('i.dur') || cLow.includes('dur.')) && opts.dur) {
           // I.dur (Last Loop Duration): IEC 62271-101 Table 1 — ≥ 90% of half-cycle
           const fr = parseFloat(document.getElementById('inp-fr')?.value) || 60;
           const halfCycle = 1000 / (2 * fr); // ms
@@ -17862,7 +17863,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
             else if (val > 500) warnDir = 'high';
           }
         }
-        else if (cLow.includes('i.last') && (opts.peak || opts.ipeak)) {
+        else if ((cLow.includes('i.last') || (cLow.includes('last') && cLow.includes('peak'))) && (opts.peak || opts.ipeak)) {
           // I.last (Last Loop Peak): IEC 62271-101 Table 1
           // 기준: Ibr_nom * √2. 탭별 하한/상한 적용
           const ibrNomEl = document.getElementById(IBR_MAP[tab]);
@@ -17881,7 +17882,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
             }
           }
         }
-        else if (cLow.includes('ima') && cLow.includes('kap') && opts.ipeak) {
+        else if (((cLow.includes('ima') && cLow.includes('kap')) || (cLow.includes('making') && cLow.includes('peak'))) && opts.ipeak) {
           // Ima(kAp) — T100s 투입: 0 ~ +5%
           const tId = IMA_PEAK_MAP[tab];
           if (tId) {
@@ -17892,7 +17893,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
             }
           }
         }
-        else if (cLow.includes('ima') && cLow.includes('karms') && opts.irms) {
+        else if (((cLow.includes('ima') && cLow.includes('karms')) || (cLow.includes('making') && cLow.includes('rms'))) && opts.irms) {
           // Ima(kArms) — T100s 투입: 0 ~ +10%
           const tId = IMA_RMS_MAP[tab];
           if (tId) {
@@ -18249,8 +18250,18 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
     const REC_SHEET_NAMES = {
       noload: '무부하', t10: 'T10', t30: 'T30', t60: 'T60',
       't100s-make': 'T100s_투입', t100s: 'T100s_차단', t100a: 'T100a',
-      l90: 'L90', vc: '절연확인', l75: 'L75', op2: 'OP2', spf: 'SPF', lccb: 'LC_CC_BC', sr: 'SR',
+      l90: 'L90', vc: '절연확인', l75: 'L75',
+      'op2-make': 'OP2_투입', op2: 'OP2_차단', spf: 'SPF',
+      'lccb-pre': 'LCCB_사전', 'lccb-d1': 'LCCB_D1', 'lccb-d2': 'LCCB_D2',
+      'sr-d1': 'SR_D1', 'sr-d2': 'SR_D2', 'sr-d3': 'SR_D3', 'sr-d4': 'SR_D4',
       'stc-main': 'STC_주회로', 'stc-test': 'STC_시험'
+    };
+
+    // ── 탭(시험종류) 표시 라벨 (파일명 생성 등 공용) ──
+    const REC_TAB_LABELS = {
+      noload: '무부하', t10: 'T10', t30: 'T30', t60: 'T60',
+      t100s: 'T100s', t100a: 'T100a', l90: 'L90', vc: '절연확인',
+      l75: 'L75', op2: 'OP2', spf: 'SPF', lccb: 'LC_CC_BC', sr: 'SR', stc: 'STC'
     };
 
     function recCollectData() {
@@ -18290,7 +18301,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
 
     function recLoadData(data) {
       if (!data) return;
-      // 커스텀 항목(컬럼) 정보 복구
+      // 커스텀 항목(컬럼) 정보 복구 (JSON 저장분에 컬럼 정의가 포함된 경우)
       if (data.cols) {
         REC_COLS = migrateRecCols(JSON.parse(JSON.stringify(data.cols)));
         // 신규 추가된 테이블이나 컬럼이 비어있는 경우 DEFAULT와 병합하여 복구
@@ -18300,12 +18311,14 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
           }
         });
         if (typeof saveRecCols === 'function') saveRecCols();
-        // 모든 테이블 헤더와 구조를 동적으로 재구축
-        REC_TABLES.forEach(tbl => {
-          const htbl = document.getElementById('tbl-' + tbl);
-          if (htbl) renderTbl(tbl, { rows: data.tables[tbl] || [], merges: (data.merges || {})[tbl] || [] });
-        });
       }
+      // 모든 테이블 헤더와 구조를 동적으로 재구축
+      // (xlsx 로드 시에도 REC_COLS가 파일의 컬럼으로 갱신되므로, data.cols 유무와 상관없이
+      //  항상 재구축해야 헤더가 예전 컬럼 구성으로 남아있다가 어긋나 보이는 문제가 생기지 않음)
+      REC_TABLES.forEach(tbl => {
+        const htbl = document.getElementById('tbl-' + tbl);
+        if (htbl) renderTbl(tbl, { rows: data.tables[tbl] || [], merges: (data.merges || {})[tbl] || [] });
+      });
       const infos = data.infos || {};
       // 하위 호환: 구버전 data.info → 모든 탭에 동일 적용
       if (!data.infos && data.info) {
@@ -18783,7 +18796,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
           XLSX.utils.book_append_sheet(wb, ws, REC_SHEET_NAMES[tbl] || tbl);
         });
       }
-      return { wb, data, i };
+      return { wb, data, i, activeTab };
     }
 
     function recSaveOverwrite() {
@@ -18811,16 +18824,20 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
 
     /* ── 새 이름으로 저장 ── */
     function recSaveAs() {
-      const { wb, data, i } = recBuildWorkbook();
-      const defaultName = (i.project || 'CB\uc2dc\ud5d8\uae30\ub85d\uc9c0') + '_' + (i.date || new Date().toISOString().slice(0, 10)) + '.xlsx';
+      const { wb, data, i, activeTab } = recBuildWorkbook();
+      const testLabel = REC_TAB_LABELS[activeTab] || activeTab;
+      const defaultName = (i.project || 'CB\uc2dc\ud5d8\uae30\ub85d\uc9c0') + '_' + testLabel + '_rawdata.xlsx';
 
       // Chrome/Edge: showSaveFilePicker로 저장 → 핸들 보관 → 이후 진짜 덮어쓰기
       if (wb && window.showSaveFilePicker) {
         let _handle;
-        window.showSaveFilePicker({
+        const _pickerOpts = {
           suggestedName: defaultName,
           types: [{ description: 'Excel Workbook', accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] } }]
-        }).then(fh => {
+        };
+        // 마지막으로 저장/불러온 위치를 기억해서 그 폴더를 기본으로 엶
+        if (recLastFileHandle) _pickerOpts.startIn = recLastFileHandle;
+        window.showSaveFilePicker(_pickerOpts).then(fh => {
           _handle = fh;
           recLastFileHandle = fh;
           recLastFilename = fh.name;
@@ -18861,7 +18878,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       let csv = '# CB \ucc28\ub2e8\uc2dc\ud5d8 \uae30\ub85d\uc9c0\n';
       csv += '\uacfc\uc81c\uba85,' + (i.project || '') + '\n\uc2dc\ud5d8\uc790,' + (i.tester || '') + '\n\uc2dc\ud5d8\uc77c\uc790,' + (i.date || '') + '\n\n';
       REC_TABLES.forEach(tbl => {
-        const _tl = {'noload':'NoLoad','t10':'T10','t30':'T30','t60':'T60','t100s':'T100s','t100s-make':'T100s-Make','t100a':'T100a','l90':'L90','vc':'VC','l75':'L75','op2-noload':'OP2-NoLoad','op2-make':'OP2-Make','op2':'OP2','spf':'SPF','lccb':'LCCB','sr':'SR','stc-main':'STC-Main','stc-test':'STC-Test'};
+        const _tl = {'noload':'NoLoad','t10':'T10','t30':'T30','t60':'T60','t100s-make':'T100s-투입','t100s':'T100s-차단','t100a':'T100a','l90':'L90','vc':'절연확인','l75':'L75','op2-make':'OP2-투입','op2':'OP2-차단','spf':'SPF','lccb-pre':'LCCB-사전','lccb-d1':'LCCB-D1','lccb-d2':'LCCB-D2','sr-d1':'SR-D1','sr-d2':'SR-D2','sr-d3':'SR-D3','sr-d4':'SR-D4','stc-main':'STC-주회로','stc-test':'STC-시험'};
         csv += '## ' + (_tl[tbl] || tbl) + '\n';
         csv += 'No.,' + REC_COLS[tbl].join(',') + '\n';
         (data.tables[tbl] || []).forEach((v, idx) => { csv += (idx + 1) + ',' + v.join(',') + '\n'; });
@@ -18929,7 +18946,16 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         }
       }
       const sm = {};
+      // 현재 버전 시트명 매핑
       Object.entries(REC_SHEET_NAMES).forEach(([tbl, sName]) => sm[sName] = tbl);
+      // 구버전 호환: 이전 시트명도 인식
+      const _legacySm = {
+        'OP2': 'op2', 'LC_CC_BC': 'lccb-d1', 'SR': 'sr-d1',
+        'OP2-차단': 'op2',  // 혹시 이전 저장본
+      };
+      Object.entries(_legacySm).forEach(([sName, tbl]) => { if (!sm[sName]) sm[sName] = tbl; });
+      // 구버전 호환: 시트명이 내부 키 그대로(예: 'lccb-pre','lccb-d1','lccb-d2','t100s-make' 등)로 저장된 경우도 인식
+      REC_TABLES.forEach(tbl => { if (!sm[tbl]) sm[tbl] = tbl; });
       Object.entries(sm).forEach(([sn, tbl]) => {
         const ws = wb2.Sheets[sn]; if (!ws) return;
         const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
@@ -18965,10 +18991,13 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
     function recLoadFile() {
       // Chrome/Edge: showOpenFilePicker → 파일핸들 보관 → 나중에 덮어쓰기 가능
       if (window.showOpenFilePicker) {
-        window.showOpenFilePicker({
+        const _openOpts = {
           types: [{ description: 'Excel / JSON', accept: { 'application/octet-stream': ['.xlsx', '.xls'], 'application/json': ['.json'] } }],
           multiple: false
-        }).then(async ([fh]) => {
+        };
+        // 마지막으로 저장/불러온 위치를 기억해서 그 폴더를 기본으로 엶
+        if (recLastFileHandle) _openOpts.startIn = recLastFileHandle;
+        window.showOpenFilePicker(_openOpts).then(async ([fh]) => {
           const file = await fh.getFile();
           const ext = file.name.split('.').pop().toLowerCase();
           if (ext === 'json') {
@@ -19597,10 +19626,13 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         const dynamicCols = REC_COLS[key] || [];
 
         // 1. Identify active columns (those with at least one non-empty value)
+        //    Remarks 컬럼은 값 유무에 관계없이 무조건 포함
+        const remarksIdx = dynamicCols.findIndex(c => c.toLowerCase().includes('remark'));
         const activeIndices = [];
-        dynamicCols.forEach((_, ci) => {
+        dynamicCols.forEach((col, ci) => {
+          const isRemarks = ci === remarksIdx;
           const hasData = rows.some(row => row[ci] && row[ci].trim() !== '');
-          if (hasData) activeIndices.push(ci);
+          if (hasData || isRemarks) activeIndices.push(ci);
         });
 
         // 2. Map old column index (0=No, 1+=dynamicCols) to new index
@@ -19611,7 +19643,13 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
 
         // 3. Filter columns and data
         const filteredDynamicCols = activeIndices.map(i => dynamicCols[i]);
-        const filteredRows = rows.map(row => activeIndices.map(i => row[i]));
+        // 빈 행(모든 셀이 비어있는 행) 제거
+        const filteredRows = rows
+          .filter(row => row.some(v => v && v.trim() !== ''))
+          .map(row => activeIndices.map(i => row[i]));
+
+        // 테이블 전체에 데이터가 없으면 이 섹션 자체를 출력하지 않음
+        if (filteredRows.length === 0) return;
 
         // 4. Adjust merges for filtered columns
         const filteredMerges = [];
@@ -19780,6 +19818,74 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       a.click(); URL.revokeObjectURL(url);
     }
 
+    // ── 현재 파트(탭)만 초기화 ──
+    const TAB_TBODIES_MAP = {
+      noload: ['noload'], t10: ['t10'], t30: ['t30'], t60: ['t60'],
+      t100s: ['t100s-make', 't100s'], t100a: ['t100a'],
+      l90: ['l90'], vc: ['vc'], l75: ['l75'],
+      op2: ['op2-make', 'op2'], spf: ['spf'],
+      lccb: ['lccb-pre', 'lccb-d1', 'lccb-d2'],
+      sr: ['sr-d1', 'sr-d2', 'sr-d3', 'sr-d4'],
+      stc: ['stc-main', 'stc-test'],
+    };
+    const TAB_LABELS_MAP = {
+      noload: '무부하', t10: 'T10', t30: 'T30', t60: 'T60', t100s: 'T100s',
+      t100a: 'T100a', l90: 'L90', vc: '절연확인', l75: 'L75', op2: 'OP2',
+      spf: 'SPF', lccb: 'LC/CC/BC', sr: 'SR', stc: 'STC'
+    };
+
+    function recClearCurrentTab() {
+      const tab = activeRecTab || 'noload';
+      const label = TAB_LABELS_MAP[tab] || tab;
+      if (!confirm('[' + label + '] 탭의 데이터만 초기화할까요?\n(해당 탭의 공통정보, 메모, 측정값만 삭제되며 다른 탭은 그대로 유지됩니다.)')) return;
+
+      // 1. 공통 정보 초기화 (현재 탭만)
+      ['project', 'tester', 'date', 'ur', 'isc', 'fr', 'ground', 'gas'].forEach(k => {
+        const el = document.getElementById('rec-' + k + '-' + tab);
+        if (el) { el.value = ''; if (k === 'fr' || k === 'ground') el.dispatchEvent(new Event('change')); }
+      });
+      if (typeof updateTabInfoSummary === 'function') updateTabInfoSummary(tab);
+
+      // 2. 메모(추가사항) 초기화 (현재 탭만)
+      const note = document.getElementById('rec-note-' + tab);
+      if (note) { note.value = ''; note.style.height = 'auto'; }
+      if (typeof updateAdditionalSummary === 'function') updateAdditionalSummary(tab);
+
+      // 3. 현재 탭에 속한 서브 테이블(들)만 초기화
+      const subTables = TAB_TBODIES_MAP[tab] || [tab];
+      subTables.forEach(tbl => {
+        // 세로 보기 상태였다면 가로 보기로 복귀
+        if (typeof orientState !== 'undefined' && orientState[tbl] === 'v') {
+          const vWrap = document.getElementById('vtbl-wrap-' + tbl);
+          if (vWrap) vWrap.remove();
+          const htbl = document.getElementById('tbl-' + tbl);
+          if (htbl) htbl.style.display = '';
+          const btn = document.getElementById('orient-btn-' + tbl);
+          if (btn) { btn.classList.remove('active'); btn.textContent = '⇅ 세로 보기'; }
+          delete orientState[tbl];
+          if (typeof saveOriState === 'function') saveOriState();
+        }
+        // Remark 분리 상태 초기화
+        if (typeof sepState !== 'undefined' && sepState[tbl]) {
+          delete sepState[tbl];
+          if (typeof saveSepState === 'function') saveSepState();
+          const sbtn = document.getElementById('sep-btn-' + tbl);
+          if (sbtn) { sbtn.classList.remove('active'); sbtn.textContent = '↔ 비고 통합'; }
+        }
+        // 테이블 본문 비우고 3줄 생성
+        const tbody = document.getElementById('tbody-' + tbl);
+        if (tbody) {
+          tbody.innerHTML = '';
+          if (typeof renderTbl === 'function') renderTbl(tbl, { rows: [], merges: [] });
+          for (let i = 0; i < 3; i++) addRow(tbl);
+        }
+      });
+
+      if (typeof debouncedSave === 'function') debouncedSave();
+      if (typeof updateRecTabBadges === 'function') updateRecTabBadges();
+      recSetStatus('✅ [' + label + '] 탭 초기화 완료', 'ok');
+    }
+
     function recClearAll() {
       if (!confirm('성적서의 모든 기록 데이터를 초기화할까요?\n(공통정보, 항목 구조, 메모 및 측정값이 모두 삭제됩니다.)')) return;
 
@@ -19825,11 +19931,15 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       }
 
       // 4. 메모 및 테이블 데이터 초기화
-      REC_TABLES.forEach(tbl => {
-        // 메모(추가사항) 비우기
-        const note = document.getElementById('rec-note-' + tbl);
+      // 메모(추가사항)는 실제 textarea가 존재하는 탭 키(NOTE_KEYS) 기준으로 초기화
+      // (REC_TABLES에는 lccb-pre/lccb-d1/lccb-d2 같은 서브키만 있어 rec-note-lccb 등을 놓치므로 별도 처리)
+      NOTE_KEYS.forEach(tab => {
+        const note = document.getElementById('rec-note-' + tab);
         if (note) { note.value = ''; note.style.height = 'auto'; }
+        if (typeof updateAdditionalSummary === 'function') updateAdditionalSummary(tab);
+      });
 
+      REC_TABLES.forEach(tbl => {
         // 테이블 본문 비우고 3줄 생성
         const tbody = document.getElementById('tbody-' + tbl);
         if (tbody) {
@@ -20064,7 +20174,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
 
       // 탭 한글 이름 매핑
       const TAB_LABEL = { t10:'T10', t30:'T30', t60:'T60', t100s:'T100s', t100a:'T100a', l90:'L90', l75:'L75', op2:'OP2', spf:'SPF', noload:'무부하', vc:'VC', lccb:'LCCB', sr:'SR', 'stc-main':'STC 주회로', 'stc-test':'STC 시험' };
-      const ratio = { t10:0.10, t30:0.30, t60:0.60, t100s:1.0, t100a:1.0, l90:0.90, l75:0.75, 'stc-main': 1.0, 'stc-test': 1.0 };
+      const ratio = { t10:0.10, t30:0.30, t60:0.60, t100s:1.0, t100a:1.0, l90:0.90, l75:0.75, op2:0.25, 'stc-main': 1.0, 'stc-test': 1.0 };
       const S23 = Math.sqrt(2 / 3);
       const warnItems = []; // { tab, rowNo, colName, val, dir }
 
@@ -20090,7 +20200,8 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       function checkRow(tab, rowNo, getCellVal, markCell) {
         if (!tab.startsWith('stc') && (!Ur || !Isc)) return;
         const ibr_nom = Isc * (ratio[tab] || 1.0);
-        const ibrTol  = (tab==='t100s'||tab==='t100a') ? [0,0.05]
+        const ibrTol  = tab==='t100s' ? [0,0.05]
+          : tab==='t100a' ? [-0.10,0.10]
           : tab==='l90' ? [0, 0.95/0.90-1] : tab==='l75' ? [-0.04,0.04]
           : (tab==='t10'||tab==='t30') ? [-0.20,0.20]
           : tab==='t60' ? [-0.10,0.10] : [0,0.10];
@@ -20101,6 +20212,10 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         else if (tab==='t30')  ucNom = Ur*kpp*1.54*S23;
         else if (tab==='t60')  ucNom = Ur*kpp*1.5*S23;
         else if (tab==='t100s'||tab==='t100a') ucNom = Ur*kpp*1.4*S23;
+        else if (tab==='op2') {
+          const kpp_op2 = activeOP2Earth === 'eff' ? 2.0 : 2.5;
+          ucNom = kpp_op2 * Ur * 1.25 * S23;
+        }
         else if (tab==='l90'||tab==='l75') {
           if (Ur && Isc) {
             const _Z = 450, _kaf = 1.4, _tdL = Ur >= 245 ? 0.5 : 0.2, _pct = tab === 'l90' ? 90 : 75;
@@ -20113,7 +20228,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         if (chk('ibr'))  markCell('Ibr',   checkDir(getCellVal('Ibr'),  ibrMin, ibrMax), rowNo, tab, ibrMin, ibrMax);
         if (chk('trv') && ucNom) {
           const ucCol = (tab==='l90'||tab==='l75') ? 'Um' : 'Uc';
-          markCell(ucCol, checkDir(getCellVal(ucCol), ucMin, ucMax), rowNo, tab, ucMin, ucMax);
+          markCell(ucCol, checkDir(Math.abs(getCellVal(ucCol)), ucMin, ucMax), rowNo, tab, ucMin, ucMax);
         }
         if (chk('peak')) {
           const nomPeak = ibr_nom*Math.sqrt(2);
@@ -20139,7 +20254,8 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
             else if (tab==='t60')          { didtMin=ref*0.90; didtMax=ref*1.10; }  // ±10%
             else if (tab==='l90')          { didtMin=ref*(0.90/0.90); didtMax=ref*(0.92/0.90); }  // 90~92% of STC
             else if (tab==='l75')          { didtMin=ref*(0.71/0.75); didtMax=ref*(0.79/0.75); }  // 71~79%
-            else                           { didtMin=ref*0.80; didtMax=ref*1.20; }  // ±20% (T10/T30/OP2/SPF)
+            else if (tab==='op2')          { didtMin=ref;      didtMax=ref*1.10; }  // 0~+10%
+            else                           { didtMin=ref*0.80; didtMax=ref*1.20; }  // ±20% (T10/T30/SPF)
             markCell('di/dt', checkDir(getCellVal('di/dt'), didtMin, didtMax), rowNo, tab, didtMin, didtMax);
           }
         }
@@ -20202,6 +20318,15 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         // STC 시험 결과 → checkRow에서 제외, 별도 독립 블록에서 처리
       }
 
+      // 논리적 컬럼명(Uc/I.last/I.dur) → 실제 헤더 표기(TRV/Last(Loop) Peak/Dur.) 별칭 매핑
+      const COL_ALIAS = { uc: ['trv'], ilast: ['lastpeak', 'lastlooppeak'], idur: ['dur'] };
+      const matchColName = (normHdr, name) => {
+        const nname = norm(name);
+        if (normHdr.includes(nname)) return true;
+        const aliasList = COL_ALIAS[nname] || [];
+        return aliasList.some(a => normHdr.includes(a));
+      };
+
       // ── 가로 모드 테이블 순회 ──
       Object.keys(ratio).forEach(tab => {
         const tblId  = `tbl-${tab}`;
@@ -20214,8 +20339,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         const colMap = {};
         tbl.querySelectorAll('thead th').forEach((th, i) => { colMap[th.textContent.trim()] = i; });
         const findColIdx = (name) => {
-          const nname = norm(name);
-          for (const k of Object.keys(colMap)) { if (norm(k).includes(nname)) return colMap[k]; }
+          for (const k of Object.keys(colMap)) { if (matchColName(norm(k), name)) return colMap[k]; }
           return -1;
         };
 
@@ -20259,10 +20383,9 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
         for (let recIdx = 0; recIdx < nRecs; recIdx++) {
           const tdIdx = recIdx + 1; // 0번째 td는 항목명 헤더
           const getCellVal = (colName) => {
-            const nname = norm(colName);
             const tr = allRows.find(r => {
               const hdr = r.querySelector('td:first-child')?.textContent?.trim() || '';
-              return norm(hdr).includes(nname);
+              return matchColName(norm(hdr), colName);
             });
             if (!tr) return NaN;
             const td = tr.querySelectorAll('td')[tdIdx];
@@ -20272,10 +20395,9 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
           };
           const markCell = (colName, dir, rowNo, _tab, minVal, maxVal, noLog=false) => {
             if (!dir) return;
-            const nname = norm(colName);
             const tr = allRows.find(r => {
               const hdr = r.querySelector('td:first-child')?.textContent?.trim() || '';
-              return norm(hdr).includes(nname);
+              return matchColName(norm(hdr), colName);
             });
             if (!tr) return;
             const td = tr.querySelectorAll('td')[tdIdx];
@@ -20284,6 +20406,41 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
           checkRow(tab, recIdx + 1, getCellVal, markCell);
         }
       });
+
+      // ── OP2 투입시험(op2-make) 독립 검증 ──
+      (function validateOP2Make() {
+        const tbl   = document.getElementById('tbl-op2-make');
+        const tbody = document.getElementById('tbody-op2-make');
+        if (!tbl || !tbody) return;
+
+        const uinRef = parseFloat(document.getElementById('op2-uin')?.textContent);
+        const imkRef = parseFloat(document.getElementById('op2-imk')?.textContent);
+
+        const colMap = {};
+        tbl.querySelectorAll('thead th').forEach((th, i) => { colMap[norm(th.textContent)] = i; });
+        const findIdx = (kw) => { const nkw = norm(kw); for (const k of Object.keys(colMap)) { if (k.includes(nkw)) return colMap[k]; } return -1; };
+        const ciUma = findIdx('Uma');
+        let ciImaRms = findIdx('ImaKArms');
+        if (ciImaRms < 0) ciImaRms = findIdx('Makingrms');
+
+        Array.from(tbody.querySelectorAll('tr')).forEach((tr, ri) => {
+          const tds = tr.querySelectorAll('td');
+          // Uma: Uin의 96.6% 이상
+          if (!isNaN(uinRef) && uinRef > 0 && ciUma >= 0 && ciUma < tds.length) {
+            const inp = tds[ciUma].querySelector('input,textarea');
+            const v = inp ? parseFloat(inp.value) : NaN;
+            const dir = checkDir(v, uinRef * 0.966, null);
+            if (dir) markWarn(tds[ciUma], dir, 'Uma', ri + 1, 'op2-make', uinRef * 0.966, null);
+          }
+          // Ima(kArms): Imk의 0 ~ +10%
+          if (!isNaN(imkRef) && imkRef > 0 && ciImaRms >= 0 && ciImaRms < tds.length) {
+            const inp = tds[ciImaRms].querySelector('input,textarea');
+            const v = inp ? parseFloat(inp.value) : NaN;
+            const dir = checkDir(v, imkRef, imkRef * 1.10);
+            if (dir) markWarn(tds[ciImaRms], dir, 'Ima(kArms)', ri + 1, 'op2-make', imkRef, imkRef * 1.10);
+          }
+        });
+      })();
 
       // ── LC/CC/BC Uc 기록지 독립 검증 ──
       (function validateLCCB() {
@@ -20305,7 +20462,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
               const ci = findIdx1('Uc');
               if (ci < 0 || ci >= tds.length) return;
               const inp = tds[ci].querySelector('input,textarea');
-              const v = inp ? parseFloat(inp.value) : NaN;
+              const v = inp ? Math.abs(parseFloat(inp.value)) : NaN;
               const dir = checkDir(v, uc1Min, uc1Max);
               if (dir) markWarn(tds[ci], dir, 'Uc', ri + 1, 'lccb', uc1Min, uc1Max);
             });
@@ -20326,7 +20483,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
               const ci = findIdx2('Uc');
               if (ci < 0 || ci >= tds.length) return;
               const inp = tds[ci].querySelector('input,textarea');
-              const v = inp ? parseFloat(inp.value) : NaN;
+              const v = inp ? Math.abs(parseFloat(inp.value)) : NaN;
               const dir = checkDir(v, uc2Min, uc2Max);
               if (dir) markWarn(tds[ci], dir, 'Uc', ri + 1, 'lccb', uc2Min, uc2Max);
             });
@@ -20394,7 +20551,7 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
             markWarn(tds[ci], dir, colName, ri + 1, tab, minVal, maxVal);
           };
 
-          markCell('Uc', checkDir(getCellVal('Uc'), ucMin, ucMax), ucMin, ucMax);
+          markCell('Uc', checkDir(Math.abs(getCellVal('Uc')), ucMin, ucMax), ucMin, ucMax);
           markCell('T3', checkDir(getCellVal('T3'), t3Min, t3Max), t3Min, t3Max);
         });
       })();
@@ -20597,7 +20754,9 @@ Uma 허용 : 96.6% 이상  (Ur×√2/√3 = ${uma} kV)`;
       // stc-main, stc-test → 통합 'stc' 패널으로 합산
       const warnByTab = {};
       warnItems.forEach(w => {
-        const key = (w.tab === 'stc-main' || w.tab === 'stc-test') ? 'stc' : w.tab;
+        const key = (w.tab === 'stc-main' || w.tab === 'stc-test') ? 'stc'
+                  : (w.tab === 'op2-make') ? 'op2'
+                  : w.tab;
         if (!warnByTab[key]) warnByTab[key] = [];
         warnByTab[key].push(w);
       });
